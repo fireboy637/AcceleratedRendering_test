@@ -1,248 +1,300 @@
 package com.github.argon4w.acceleratedrendering.configs;
 
+import cn.xiaym.unifiedconf.EnumReference;
+import cn.xiaym.unifiedconf.IntReference;
 import com.github.argon4w.acceleratedrendering.core.meshes.MeshType;
-import net.neoforged.neoforge.common.ModConfigSpec;
-import org.apache.commons.lang3.tuple.Pair;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import me.shedaniel.clothconfig2.api.ConfigBuilder;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 
 public class FeatureConfig {
+    public static final FeatureConfig CONFIG = new FeatureConfig();
+    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir()
+            .resolve("accelerated-rendering.json");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    public static final FeatureConfig CONFIG;
-    public static final ModConfigSpec SPEC;
+    public final IntReference corePooledBufferSetSize = new IntReference(5);
+    public final IntReference corePooledElementBufferSize = new IntReference(32);
+    public final IntReference coreCachedImageSize = new IntReference(32);
+    public final EnumReference<FeatureStatus> coreDebugContextEnabled = new EnumReference<>(FeatureStatus.ENABLED);
+    public final EnumReference<FeatureStatus> coreForceTranslucentAcceleration = new EnumReference<>(FeatureStatus.DISABLED);
+    public final EnumReference<FeatureStatus> coreCacheIdenticalPose = new EnumReference<>(FeatureStatus.ENABLED);
 
-    public final ModConfigSpec.IntValue corePooledBufferSetSize;
-    public final ModConfigSpec.IntValue corePooledElementBufferSize;
-    public final ModConfigSpec.IntValue coreCachedImageSize;
-    public final ModConfigSpec.ConfigValue<FeatureStatus> coreDebugContextEnabled;
-    public final ModConfigSpec.ConfigValue<FeatureStatus> coreForceTranslucentAcceleration;
-    public final ModConfigSpec.ConfigValue<FeatureStatus> coreCacheIdenticalPose;
+    public final EnumReference<FeatureStatus> acceleratedEntityRenderingFeatureStatus = new EnumReference<>(FeatureStatus.ENABLED);
+    public final EnumReference<PipelineSetting> acceleratedEntityRenderingDefaultPipeline = new EnumReference<>(PipelineSetting.ACCELERATED);
+    public final EnumReference<MeshType> acceleratedEntityRenderingMeshType = new EnumReference<>(MeshType.SERVER);
 
-    public final ModConfigSpec.ConfigValue<FeatureStatus> acceleratedEntityRenderingFeatureStatus;
-    public final ModConfigSpec.ConfigValue<PipelineSetting> acceleratedEntityRenderingDefaultPipeline;
-    public final ModConfigSpec.ConfigValue<MeshType> acceleratedEntityRenderingMeshType;
+    public final EnumReference<FeatureStatus> acceleratedBlockEntityRenderingFeatureStatus = new EnumReference<>(FeatureStatus.ENABLED);
+    public final EnumReference<PipelineSetting> acceleratedBlockEntityRenderingDefaultPipeline = new EnumReference<>(PipelineSetting.ACCELERATED);
+    public final EnumReference<MeshType> acceleratedBlockEntityRenderingMeshType = new EnumReference<>(MeshType.SERVER);
 
-    public final ModConfigSpec.ConfigValue<FeatureStatus> acceleratedTextRenderingFeatureStatus;
-    public final ModConfigSpec.ConfigValue<PipelineSetting> acceleratedTextRenderingDefaultPipeline;
-    public final ModConfigSpec.ConfigValue<MeshType> acceleratedTextRenderingMeshType;
+    public final EnumReference<FeatureStatus> acceleratedTextRenderingFeatureStatus = new EnumReference<>(FeatureStatus.ENABLED);
+    public final EnumReference<PipelineSetting> acceleratedTextRenderingDefaultPipeline = new EnumReference<>(PipelineSetting.ACCELERATED);
+    public final EnumReference<MeshType> acceleratedTextRenderingMeshType = new EnumReference<>(MeshType.SERVER);
 
-    public final ModConfigSpec.ConfigValue<FeatureStatus> acceleratedBlockEntityRenderingFeatureStatus;
-    public final ModConfigSpec.ConfigValue<PipelineSetting> acceleratedBlockEntityRenderingDefaultPipeline;
-    public final ModConfigSpec.ConfigValue<MeshType> acceleratedBlockEntityRenderingMeshType;
+    public final EnumReference<FeatureStatus> orientationCullingFeatureStatus = new EnumReference<>(FeatureStatus.ENABLED);
+    public final EnumReference<FeatureStatus> orientationCullingDefaultCulling = new EnumReference<>(FeatureStatus.ENABLED);
+    public final EnumReference<FeatureStatus> orientationCullingIgnoreCullState = new EnumReference<>(FeatureStatus.DISABLED);
 
-    public final ModConfigSpec.ConfigValue<FeatureStatus> orientationCullingFeatureStatus;
-    public final ModConfigSpec.ConfigValue<FeatureStatus> orientationCullingDefaultCulling;
-    public final ModConfigSpec.ConfigValue<FeatureStatus> orientationCullingIgnoreCullState;
+    public final EnumReference<FeatureStatus> irisCompatFeatureStatus = new EnumReference<>(FeatureStatus.ENABLED);
+    public final EnumReference<FeatureStatus> irisCompatOrientationCullingCompat = new EnumReference<>(FeatureStatus.ENABLED);
+    public final EnumReference<FeatureStatus> irisCompatShadowCulling = new EnumReference<>(FeatureStatus.ENABLED);
+    public final EnumReference<FeatureStatus> irisCompatEntitiesCompat = new EnumReference<>(FeatureStatus.ENABLED);
+    public final EnumReference<FeatureStatus> irisCompatPolygonProcessing = new EnumReference<>(FeatureStatus.ENABLED);
+    public final EnumReference<FeatureStatus> irisCompatFastRenderTypeCheck = new EnumReference<>(FeatureStatus.ENABLED);
 
-    public final ModConfigSpec.ConfigValue<FeatureStatus> irisCompatFeatureStatus;
-    public final ModConfigSpec.ConfigValue<FeatureStatus> irisCompatOrientationCullingCompat;
-    public final ModConfigSpec.ConfigValue<FeatureStatus> irisCompatShadowCulling;
-    public final ModConfigSpec.ConfigValue<FeatureStatus> irisCompatEntitiesCompat;
-    public final ModConfigSpec.ConfigValue<FeatureStatus> irisCompatPolygonProcessing;
-    public final ModConfigSpec.ConfigValue<FeatureStatus> irisCompatFastRenderTypeCheck;
+    // Welcome to hell
+    public Screen createConfigScreen(Screen parent) {
+        FeatureConfig defaultConfig = new FeatureConfig();
 
-    static {
-        Pair<FeatureConfig, ModConfigSpec> pair = new ModConfigSpec.Builder().configure(FeatureConfig::new);
+        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent)
+                .setTitle(Component.translatable("acceleratedrendering.configuration.title"))
+                .setSavingRunnable(this::saveConfig);
 
-        CONFIG = pair.getLeft();
-        SPEC = pair.getRight();
+        // Core Settings
+        builder.getOrCreateCategory(Component.translatable("acceleratedrendering.configuration.core_settings"))
+                .addEntry(builder.entryBuilder()
+                        .startIntField(Component.translatable("acceleratedrendering.configuration.core_settings.pooled_buffer_set_size"), corePooledBufferSetSize.getAsInt())
+                        .requireRestart()
+                        .setDefaultValue(defaultConfig.corePooledBufferSetSize.getAsInt())
+                        .setMin(1)
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.core_settings.pooled_buffer_set_size.tooltip"))
+                        .setSaveConsumer(corePooledBufferSetSize::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startIntField(Component.translatable("acceleratedrendering.configuration.core_settings.pooled_element_buffer_size"), corePooledElementBufferSize.getAsInt())
+                        .requireRestart()
+                        .setDefaultValue(defaultConfig.corePooledElementBufferSize.getAsInt())
+                        .setMin(1)
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.core_settings.pooled_element_buffer_size.tooltip"))
+                        .setSaveConsumer(corePooledElementBufferSize::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startIntField(Component.translatable("acceleratedrendering.configuration.core_settings.cached_image_size"), coreCachedImageSize.getAsInt())
+                        .setDefaultValue(defaultConfig.coreCachedImageSize.getAsInt())
+                        .setMin(1)
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.core_settings.cached_image_size.tooltip"))
+                        .setSaveConsumer(coreCachedImageSize::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.core_settings.debug_context"), FeatureStatus.class, coreDebugContextEnabled.get())
+                        .requireRestart()
+                        .setDefaultValue(defaultConfig.coreDebugContextEnabled.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.core_settings.debug_context.tooltip"))
+                        .setSaveConsumer(coreDebugContextEnabled::set)
+                        .build()
+                )
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.core_settings.force_translucent_acceleration"), FeatureStatus.class, coreForceTranslucentAcceleration.get())
+                        .setDefaultValue(defaultConfig.coreForceTranslucentAcceleration.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.core_settings.force_translucent_acceleration.tooltip"))
+                        .setSaveConsumer(coreForceTranslucentAcceleration::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.core_settings.cache_identical_pose"), FeatureStatus.class, coreCacheIdenticalPose.get())
+                        .setDefaultValue(defaultConfig.coreCacheIdenticalPose.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.core_settings.cache_identical_pose.tooltip"))
+                        .setSaveConsumer(coreCacheIdenticalPose::set)
+                        .build());
+
+        // Accelerated Entity Rendering Settings
+        builder.getOrCreateCategory(Component.translatable("acceleratedrendering.configuration.accelerated_entity_rendering"))
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.accelerated_entity_rendering.feature_status"), FeatureStatus.class, acceleratedEntityRenderingFeatureStatus.get())
+                        .setDefaultValue(defaultConfig.acceleratedEntityRenderingFeatureStatus.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.accelerated_entity_rendering.feature_status.tooltip"))
+                        .setSaveConsumer(acceleratedEntityRenderingFeatureStatus::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.accelerated_entity_rendering.default_pipeline"), PipelineSetting.class, acceleratedEntityRenderingDefaultPipeline.get())
+                        .setDefaultValue(defaultConfig.acceleratedEntityRenderingDefaultPipeline.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.accelerated_entity_rendering.default_pipeline.tooltip"))
+                        .setSaveConsumer(acceleratedEntityRenderingDefaultPipeline::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.accelerated_entity_rendering.mesh_type"), MeshType.class, acceleratedEntityRenderingMeshType.get())
+                        .requireRestart()
+                        .setDefaultValue(defaultConfig.acceleratedEntityRenderingMeshType.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.accelerated_entity_rendering.mesh_type.tooltip"))
+                        .setSaveConsumer(acceleratedEntityRenderingMeshType::set)
+                        .build());
+
+        // Accelerated Block Entity Rendering Settings
+        builder.getOrCreateCategory(Component.translatable("acceleratedrendering.configuration.accelerated_block_entity_rendering"))
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.accelerated_block_entity_rendering.feature_status"), FeatureStatus.class, acceleratedBlockEntityRenderingFeatureStatus.get())
+                        .setDefaultValue(defaultConfig.acceleratedBlockEntityRenderingFeatureStatus.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.accelerated_block_entity_rendering.feature_status.tooltip"))
+                        .setSaveConsumer(acceleratedBlockEntityRenderingFeatureStatus::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.accelerated_block_entity_rendering.default_pipeline"), PipelineSetting.class, acceleratedBlockEntityRenderingDefaultPipeline.get())
+                        .setDefaultValue(defaultConfig.acceleratedBlockEntityRenderingDefaultPipeline.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.accelerated_block_entity_rendering.default_pipeline.tooltip"))
+                        .setSaveConsumer(acceleratedBlockEntityRenderingDefaultPipeline::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.accelerated_block_entity_rendering.mesh_type"), MeshType.class, acceleratedBlockEntityRenderingMeshType.get())
+                        .requireRestart()
+                        .setDefaultValue(defaultConfig.acceleratedBlockEntityRenderingMeshType.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.accelerated_block_entity_rendering.mesh_type.tooltip"))
+                        .setSaveConsumer(acceleratedBlockEntityRenderingMeshType::set)
+                        .build());
+
+        // Accelerated Text Rendering Settings
+        builder.getOrCreateCategory(Component.translatable("acceleratedrendering.configuration.accelerated_text_rendering"))
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.accelerated_text_rendering.feature_status"), FeatureStatus.class, acceleratedTextRenderingFeatureStatus.get())
+                        .setDefaultValue(defaultConfig.acceleratedTextRenderingFeatureStatus.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.accelerated_text_rendering.feature_status.tooltip"))
+                        .setSaveConsumer(acceleratedTextRenderingFeatureStatus::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.accelerated_text_rendering.default_pipeline"), PipelineSetting.class, acceleratedTextRenderingDefaultPipeline.get())
+                        .setDefaultValue(defaultConfig.acceleratedTextRenderingDefaultPipeline.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.accelerated_text_rendering.default_pipeline.tooltip"))
+                        .setSaveConsumer(acceleratedTextRenderingDefaultPipeline::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.accelerated_text_rendering.mesh_type"), MeshType.class, acceleratedTextRenderingMeshType.get())
+                        .requireRestart()
+                        .setDefaultValue(defaultConfig.acceleratedTextRenderingMeshType.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.accelerated_text_rendering.mesh_type.tooltip"))
+                        .setSaveConsumer(acceleratedTextRenderingMeshType::set)
+                        .build());
+
+        // Simple Orientation Face Culling Settings
+        builder.getOrCreateCategory(Component.translatable("acceleratedrendering.configuration.orientation_culling"))
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.orientation_culling.feature_status"), FeatureStatus.class, orientationCullingFeatureStatus.get())
+                        .setDefaultValue(defaultConfig.orientationCullingFeatureStatus.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.orientation_culling.feature_status.tooltip"))
+                        .setSaveConsumer(orientationCullingFeatureStatus::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.orientation_culling.default_culling"), FeatureStatus.class, orientationCullingDefaultCulling.get())
+                        .setDefaultValue(defaultConfig.orientationCullingDefaultCulling.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.orientation_culling.default_culling.tooltip"))
+                        .setSaveConsumer(orientationCullingDefaultCulling::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.orientation_culling.ignore_cull_state"), FeatureStatus.class, orientationCullingIgnoreCullState.get())
+                        .setDefaultValue(defaultConfig.orientationCullingIgnoreCullState.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.orientation_culling.ignore_cull_state.tooltip"))
+                        .setSaveConsumer(orientationCullingIgnoreCullState::set)
+                        .build());
+
+        // Iris Compatibility Settings
+        builder.getOrCreateCategory(Component.translatable("acceleratedrendering.configuration.iris_compatibility"))
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.iris_compatibility.feature_status"), FeatureStatus.class, irisCompatFeatureStatus.get())
+                        .setDefaultValue(defaultConfig.irisCompatFeatureStatus.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.iris_compatibility.feature_status.tooltip"))
+                        .setSaveConsumer(irisCompatFeatureStatus::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.iris_compatibility.orientation_culling_compatibility"), FeatureStatus.class, irisCompatOrientationCullingCompat.get())
+                        .setDefaultValue(defaultConfig.irisCompatOrientationCullingCompat.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.iris_compatibility.orientation_culling_compatibility.tooltip"))
+                        .setSaveConsumer(irisCompatOrientationCullingCompat::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.iris_compatibility.shadow_culling"), FeatureStatus.class, irisCompatShadowCulling.get())
+                        .setDefaultValue(defaultConfig.irisCompatShadowCulling.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.iris_compatibility.shadow_culling.tooltip"))
+                        .setSaveConsumer(irisCompatShadowCulling::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.iris_compatibility.entities_compatibility"), FeatureStatus.class, irisCompatEntitiesCompat.get())
+                        .setDefaultValue(defaultConfig.irisCompatEntitiesCompat.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.iris_compatibility.entities_compatibility.tooltip"))
+                        .setSaveConsumer(irisCompatEntitiesCompat::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.iris_compatibility.polygon_processing"), FeatureStatus.class, irisCompatPolygonProcessing.get())
+                        .setDefaultValue(defaultConfig.irisCompatPolygonProcessing.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.iris_compatibility.polygon_processing.tooltip"))
+                        .setSaveConsumer(irisCompatPolygonProcessing::set)
+                        .build())
+                .addEntry(builder.entryBuilder()
+                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.iris_compatability.fast_render_type_check"), FeatureStatus.class, irisCompatFastRenderTypeCheck.get())
+                        .setDefaultValue(defaultConfig.irisCompatFastRenderTypeCheck.get())
+                        .setTooltip(Component.translatable("acceleratedrendering.configuration.iris_compatability.fast_render_type_check.tooltip"))
+                        .setSaveConsumer(irisCompatFastRenderTypeCheck::set)
+                        .build());
+
+        return builder.build();
     }
 
-    private FeatureConfig(ModConfigSpec.Builder builder) {
-        builder
-                .comment("Core Settings")
-                .comment("Core Settings allows you to change setting that are related to all rendering features.")
-                .translation("acceleratedrendering.configuration.core_settings")
-                .push("core_settings");
+    public void loadConfig() {
+        if (Files.notExists(CONFIG_PATH)) {
+            saveConfig();
+            return;
+        }
 
-        corePooledBufferSetSize = builder
-                .gameRestart()
-                .comment("Count of buffer sets that holds data for in-flight frame rendering.")
-                .comment("Changing this value may affects your FPS. Smaller value means less in-flight frames, while larger values means more in-flight frames. More in-flight frames means more FPS but more VRAM.")
-                .translation("acceleratedrendering.configuration.core_settings.pooled_buffer_set_size")
-                .defineInRange("pooled_buffer_set_size", 5, 1, Integer.MAX_VALUE);
+        try {
+            JsonObject object = GSON.fromJson(Files.readString(CONFIG_PATH), JsonObject.class);
 
-        corePooledElementBufferSize = builder
-                .gameRestart()
-                .comment("Count of batches of RenderTypes that is allowed in a draw call.")
-                .comment("Changing this value may affects your FPS. Smaller value means less batches allowed in a draw call, while larger values means more batches. More batches means more FPS but more VRAM and more CPU pressure on handling RenderTypes.")
-                .translation("acceleratedrendering.configuration.core_settings.pooled_element_buffer_size")
-                .defineInRange("pooled_element_buffer_size", 32, 1, Integer.MAX_VALUE);
+            Arrays.stream(FeatureConfig.class.getFields()).filter(it -> {
+                Class<?> type = it.getType();
+                return object.has(it.getName()) && type == IntReference.class || type == EnumReference.class;
+            }).forEach(it -> {
+                try {
+                    JsonElement element = object.get(it.getName());
+                    Object fieldValue = it.get(this);
+                    if (fieldValue instanceof IntReference intReference) {
+                        intReference.set(element.getAsInt());
+                    } else if (fieldValue instanceof EnumReference<?>) {
+                        String typeName = it.getGenericType().getTypeName();
+                        Class<?> enumClass = Class.forName(typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">")));
+                        Enum<?> enumValue = (Enum<?>) enumClass.getMethod("valueOf", String.class)
+                                .invoke(null, element.getAsString());
+                        EnumReference.class.getMethod("set", Enum.class).invoke(fieldValue, enumValue);
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } catch (Exception e) {
+            LoggerFactory.getLogger("AcceleratedRendering")
+                    .error("Failed to load config, using default settings instead.", e instanceof RuntimeException ? e.getCause() : e);
+        }
+    }
 
-        coreCachedImageSize = builder
-                .comment("Count of images that cached for static mesh culling.")
-                .comment("Changing this value may affects your FPS. Smaller value means less images allowed to be cached, while larger means more cached images. More cached images means more FPS but more RAM pressure.")
-                .translation("acceleratedrendering.configuration.core_settings.cached_image_size")
-                .defineInRange("cached_image_size", 32, 1, Integer.MAX_VALUE);
+    public void saveConfig() {
+        JsonObject object = new JsonObject();
 
-        coreDebugContextEnabled = builder
-                .comment("- DISABLED: Debug context will be disabled, which may cause significant rendering glitches on some NVIDIA cards because of the \"theaded optimization\".")
-                .comment("- ENABLED: Debug context will be enabled, which can prevent NVIDIA driver from applying the \"threaded optimization\" that causes the glitches.")
-                .translation("acceleratedrendering.configuration.core_settings.debug_context")
-                .gameRestart()
-                .defineEnum("debug_context", FeatureStatus.ENABLED);
+        Arrays.stream(FeatureConfig.class.getFields()).filter(it -> {
+            Class<?> type = it.getType();
+            return type == IntReference.class || type == EnumReference.class;
+        }).forEach(it -> {
+            try {
+                Object value = it.get(this);
+                if (value instanceof IntReference) {
+                    object.addProperty(it.getName(), ((IntReference) value).getAsInt());
+                } else if (value instanceof EnumReference) {
+                    object.addProperty(it.getName(), ((EnumReference<?>) value).get().name());
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
-        coreForceTranslucentAcceleration = builder
-                .comment("- DISABLED: Translucent RenderType will fallback to vanilla rendering pipeline if the accelerated pipeline does not support translucent sorting unless mods explicitly enable force translucent acceleration temporarily when rendering their own faces.")
-                .comment("- ENABLED: Translucent RenderType will still be rendered in accelerated pipeline even if the pipeline does not support translucent sorting unless mods explicitly disable force translucent acceleration temporarily when rendering their own faces.")
-                .translation("acceleratedrendering.configuration.core_settings.force_translucent_acceleration")
-                .defineEnum("force_translucent_acceleration", FeatureStatus.DISABLED);
-
-        coreCacheIdenticalPose = builder
-                .comment("- DISABLED: Poses with identical transform matrix and normal matrix that used to transform vertices will not be cached in buffer which slightly decreases CPU pressure but increase VRAM usage unless mods explicitly disable it when rendering.")
-                .comment("- ENABLED: Poses with identical transform matrix and normal matrix that used to transform vertices will be cached in buffer which save VRAM but slightly increase CPU pressure unless mods explicitly disable it when rendering.")
-                .translation("acceleratedrendering.configuration.core_settings.cache_identical_pose")
-                .defineEnum("cache_identical_pose", FeatureStatus.ENABLED);
-
-        builder.pop();
-
-        builder
-                .comment("Accelerated Entity Rendering Settings")
-                .comment("Accelerated Entity Rendering uses GPU to cache and transform vertices while rendering model parts of entities, instead of generating and transforming vertices every time the model parts are rendered in CPU.")
-                .translation("acceleratedrendering.configuration.accelerated_entity_rendering")
-                .push("accelerated_entity_rendering");
-
-        acceleratedEntityRenderingFeatureStatus = builder
-                .comment("- DISABLED: Disable accelerated entity rendering.")
-                .comment("- ENABLED: Enable accelerated entity rendering.")
-                .translation("acceleratedrendering.configuration.accelerated_entity_rendering.feature_status")
-                .defineEnum("feature_status", FeatureStatus.ENABLED);
-
-        acceleratedEntityRenderingDefaultPipeline = builder
-                .comment("- VANILLA: Entities will not be rendered into the accelerated pipeline unless mods explicitly enable it temporarily when rendering their own entities.")
-                .comment("- ACCELERATED: All entities will be rendered in the accelerated pipeline unless mods explicitly disable it temporarily when rendering their own entities.")
-                .translation("acceleratedrendering.configuration.accelerated_entity_rendering.default_pipeline")
-                .defineEnum("default_pipeline", PipelineSetting.ACCELERATED);
-
-        acceleratedEntityRenderingMeshType = builder
-                .gameRestart()
-                .comment("- CLIENT: Cached mesh will be stored on the client side (CPU), which will use less VRAM but take more time to upload to the server side (GPU) during rendering.")
-                .comment("- SERVER: Cached mesh will be stored on the server side (GPU), which may speed up rendering but will use more VRAM to store the mesh.")
-                .translation("acceleratedrendering.configuration.accelerated_entity_rendering.mesh_type")
-                .defineEnum("mesh_type", MeshType.SERVER);
-
-        builder.pop();
-
-        builder
-                .comment("Accelerated Block Entity Rendering Settings")
-                .comment("Accelerated Block Entity Rendering uses GPU to cache and transform vertices while rendering block entities, instead of generating and transforming vertices every time the block entities are rendered in CPU.")
-                .translation("acceleratedrendering.configuration.accelerated_block_entity_rendering")
-                .push("accelerated_block_entity_rendering");
-
-        acceleratedBlockEntityRenderingFeatureStatus = builder
-                .comment("- DISABLED: Disable accelerated block entity rendering.")
-                .comment("- ENABLED: Enable accelerated block entity rendering.")
-                .translation("acceleratedrendering.configuration.accelerated_block_entity_rendering.feature_status")
-                .defineEnum("feature_status", FeatureStatus.ENABLED);
-
-        acceleratedBlockEntityRenderingDefaultPipeline = builder
-                .comment("- VANILLA: Block entities will not be rendered into the accelerated pipeline unless mods explicitly enable it temporarily when rendering their own block entities.")
-                .comment("- ACCELERATED: All block entities will be rendered in the accelerated pipeline unless mods explicitly disable it temporarily when rendering their own block entities.")
-                .translation("acceleratedrendering.configuration.accelerated_block_entity_rendering.default_pipeline")
-                .defineEnum("default_pipeline", PipelineSetting.ACCELERATED);
-
-        acceleratedBlockEntityRenderingMeshType = builder
-                .gameRestart()
-                .comment("- CLIENT: Cached mesh will be stored on the client side (CPU), which will use less VRAM but take more time to upload to the server side (GPU) during rendering.")
-                .comment("- SERVER: Cached mesh will be stored on the server side (GPU), which may speed up rendering but will use more VRAM to store the mesh.")
-                .translation("acceleratedrendering.configuration.accelerated_block_entity_rendering.mesh_type")
-                .defineEnum("mesh_type", MeshType.SERVER);
-
-        builder.pop();
-
-        builder
-                .comment("Accelerated Text Rendering Settings")
-                .comment("Accelerated Text Rendering uses GPU to cache and transform vertices while rendering text through BakedGlyph, instead of generating and transforming vertices every time the text are rendered in CPU.")
-                .translation("acceleratedrendering.configuration.accelerated_text_rendering")
-                .push("accelerated_text_rendering");
-
-        acceleratedTextRenderingFeatureStatus = builder
-                .comment("- DISABLED: Disable accelerated text rendering.")
-                .comment("- ENABLED: Enable accelerated text rendering.")
-                .translation("acceleratedrendering.configuration.accelerated_text_rendering.feature_status")
-                .defineEnum("feature_status", FeatureStatus.ENABLED);
-
-        acceleratedTextRenderingDefaultPipeline = builder
-                .comment("- VANILLA: Text will not be rendered into the accelerated pipeline unless mods explicitly enable it temporarily when rendering their own text.")
-                .comment("- ACCELERATED: All text will be rendered in the accelerated pipeline unless mods explicitly disable it temporarily when rendering their own text.")
-                .translation("acceleratedrendering.configuration.accelerated_text_rendering.default_pipeline")
-                .defineEnum("default_pipeline", PipelineSetting.ACCELERATED);
-
-        acceleratedTextRenderingMeshType = builder
-                .gameRestart()
-                .comment("- CLIENT: Cached mesh will be stored on the client side (CPU), which will use less VRAM but take more time to upload to the server side (GPU) during rendering.")
-                .comment("- SERVER: Cached mesh will be stored on the server side (GPU), which may speed up rendering but will use more VRAM to store the mesh.")
-                .translation("acceleratedrendering.configuration.accelerated_text_rendering.mesh_type")
-                .defineEnum("mesh_type", MeshType.SERVER);
-
-        builder.pop();
-
-        builder
-                .comment("Simple Orientation Face Culling Settings")
-                .comment("Simple Orientation face culling uses an compute shader before the draw call to discard faces that is not visible on screen by checking if it is facing to the screen using a determinant of 3 * 3 matrix.")
-                .translation("acceleratedrendering.configuration.orientation_culling")
-                .push("orientation_culling");
-
-        orientationCullingFeatureStatus = builder
-                .comment("- DISABLED: Disable simple orientation face culling.")
-                .comment("- ENABLED: Enable simple orientation face culling.")
-                .translation("acceleratedrendering.configuration.orientation_culling.feature_status")
-                .defineEnum("feature_Status", FeatureStatus.ENABLED);
-
-        orientationCullingDefaultCulling = builder
-                .comment("- DISABLED: Faces will not be culled unless mods explicitly enable it temporarily when rendering their own faces.")
-                .comment("- ENABLED: All faces will be culled unless mods explicitly disable it temporarily when rendering their own faces.")
-                .translation("acceleratedrendering.configuration.orientation_culling.default_culling")
-                .defineEnum("default_culling", FeatureStatus.ENABLED);
-
-        orientationCullingIgnoreCullState = builder
-                .comment("- DISABLED: Simple orientation face culling will not cull entities that are not declared as \"cullable\".")
-                .comment("- ENABLED: Simple orientation face culling will cull all entities even if they are not declared as \"cullable\".")
-                .translation("acceleratedrendering.configuration.orientation_culling.ignore_cull_state")
-                .defineEnum("ignore_cull_state", FeatureStatus.DISABLED);
-
-        builder.pop();
-
-        builder
-                .comment("Iris Compatibility Settings")
-                .comment("Iris Compatibility Settings allows Accelerated Rendering to work correctly with Iris.")
-                .translation("acceleratedrendering.configuration.iris_compatibility")
-                .push("iris_compatibility");
-
-        irisCompatFeatureStatus = builder
-                .comment("- DISABLED: Accelerated Rendering will be incompatible with Iris and cause visual glitches when working with Iris.")
-                .comment("- ENABLED: Accelerated Rendering will use compute shaders that fits Iris's vertex formats, which make it compatible with Iris.")
-                .translation("acceleratedrendering.configuration.iris_compatibility.feature_status")
-                .defineEnum("feature_status", FeatureStatus.ENABLED);
-
-        irisCompatOrientationCullingCompat = builder
-                .comment("- DISABLED: Simple Orientation culling will not work with Iris because the culling shader is for vanilla's vertex formats.")
-                .comment("- ENABLED: Simple Orientation culling will use another culling shader that fits iris's vertex format, which make it compatible with Iris.")
-                .translation("acceleratedrendering.configuration.iris_compatibility.orientation_culling_compatibility")
-                .defineEnum("orientation_culling_compatibility", FeatureStatus.ENABLED);
-
-        irisCompatShadowCulling = builder
-                .comment("- DISABLED: Entities will not be culled when they are rendered as shadows unless mods explicitly enable it temporarily when rendering their own shadows. Which reduce FPS due to redundant faces.")
-                .comment("- ENABLED: Entities will be culled when they are rendered as shadows unless mods explicitly disable it temporarily when rendering their own shadows. Redundant faces will be culled and improve FPS, but it may cause incorrect shadows.")
-                .translation("acceleratedrendering.configuration.iris_compatibility.shadow_culling")
-                .defineEnum("shadow_culling", FeatureStatus.ENABLED);
-
-        irisCompatEntitiesCompat = builder
-                .comment("- DISABLED: renderEntity called from Iris will not render entity into the accelerated pipeline.")
-                .comment("- ENABLED: renderEntity called from Iris will render entity into the accelerated pipeline.")
-                .translation("acceleratedrendering.configuration.iris_compatibility.entities_compatibility")
-                .defineEnum("entities_compatibility", FeatureStatus.ENABLED);
-
-        irisCompatPolygonProcessing = builder
-                .comment("- DISABLED: Extra information in vertices provided by Iris will not be included or calculated in the accelerated pipeline unless mods explicitly enable it temporarily when rendering their own faces, which may cause visual glitches or incorrect rendering.")
-                .comment("- ENABLED: Extra information in vertices provided by Iris will be included and calculated in the accelerated pipeline by a compute shader unless mods explicitly disable it temporarily when rendering their own faces.")
-                .translation("acceleratedrendering.configuration.iris_compatibility.polygon_processing")
-                .defineEnum("polygon_processing", FeatureStatus.ENABLED);
-
-        irisCompatFastRenderTypeCheck = builder
-                .comment("- DISABLED: Accelerated Rendering will use slow but safe \"instanceof\" operation in checking wrapped RenderType created by Iris.")
-                .comment("- ENABlED: Accelerated Rendering will use extension interface in checking wrapped RenderType created by Iris, which is faster but unsafe if other mods also implemented \"WrappableRenderType\". (but who will?)")
-                .translation("acceleratedrendering.configuration.iris_compatability.fast_render_type_check")
-                .defineEnum("fast_render_type_check", FeatureStatus.ENABLED);
-
-        builder.pop();
+        try {
+            Files.writeString(CONFIG_PATH, GSON.toJson(object));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
