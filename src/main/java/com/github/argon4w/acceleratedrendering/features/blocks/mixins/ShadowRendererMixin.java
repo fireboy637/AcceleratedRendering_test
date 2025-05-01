@@ -74,7 +74,7 @@ public class ShadowRendererMixin {
         }
 
         BlockEntityRenderDispatcher dispatcher = Minecraft.getInstance().getBlockEntityRenderDispatcher();
-        Long2ObjectMap<SortedSet<BlockDestructionProgress>> blockBreakingProgressions = ((LevelRendererAccessor)Minecraft.getInstance().levelRenderer).getDestructionProgress();
+        Long2ObjectMap<SortedSet<BlockDestructionProgress>> blockBreakingProgressions = ((LevelRendererAccessor)Minecraft.getInstance().levelRenderer).getField_20950() /* getDestructionProgress() */;
         MutableInt counter = new MutableInt(0);
 
         SodiumWorldRenderer.instance().iterateVisibleBlockEntities(blockEntity -> {

@@ -198,9 +198,10 @@ public class AcceleratedSheetedDecalTextureGenerator implements IAcceleratedVert
         );
 
         Direction direction = Direction.getNearest(
-                normal.x(),
-                normal.y(),
-                normal.z()
+                (int) normal.x(),
+                (int) normal.y(),
+                (int) normal.z(),
+                null
         );
 
         camera.rotateY((float) Math.PI);

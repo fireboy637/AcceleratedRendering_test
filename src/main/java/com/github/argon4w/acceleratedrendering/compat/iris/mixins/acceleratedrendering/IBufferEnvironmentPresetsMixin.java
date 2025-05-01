@@ -14,13 +14,8 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(IBufferEnvironment.Presets.class)
+@Mixin(value = IBufferEnvironment.Presets.class, remap = false)
 public class IBufferEnvironmentPresetsMixin {
-
-    @Mutable @Shadow @Final public static IBufferEnvironment BLOCK;
-    @Mutable @Shadow @Final public static IBufferEnvironment ENTITY;
-    @Mutable @Shadow @Final public static IBufferEnvironment POS_COLOR_TEX_LIGHT;
-
     @WrapOperation(method = "<clinit>", at = @At(value = "FIELD", target = "Lcom/github/argon4w/acceleratedrendering/core/buffers/environments/IBufferEnvironment$Presets;BLOCK:Lcom/github/argon4w/acceleratedrendering/core/buffers/environments/IBufferEnvironment;", opcode = Opcodes.PUTSTATIC))
     private static void useIrisBloockEnvironment(IBufferEnvironment value, Operation<Void> original) {
         original.call(new IrisBufferEnvironment(

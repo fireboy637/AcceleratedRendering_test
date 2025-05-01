@@ -28,19 +28,16 @@ import java.util.SortedSet;
 public abstract class LevelRendererMixin {
 
     @Shadow @Final private Long2ObjectMap<SortedSet<BlockDestructionProgress>> destructionProgress;
-    @Shadow @Final private Minecraft minecraft;
+//    @Shadow @Final private Minecraft minecraft;
 
-    @Shadow public abstract boolean shouldShowEntityOutlines();
-
-    @WrapOperation(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/blockentity/BlockEntityRenderDispatcher;render(Lnet/minecraft/world/level/block/entity/BlockEntity;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V"))
+    @WrapOperation(method = "renderBlockEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/blockentity/BlockEntityRenderDispatcher;render(Lnet/minecraft/world/level/block/entity/BlockEntity;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V"))
     public void wrapRenderBlockEntity(
             BlockEntityRenderDispatcher instance,
             BlockEntity pBlockEntity,
             float pPartialTick,
             PoseStack pPoseStack,
             MultiBufferSource pBufferSource,
-            Operation<Void> original,
-            @Local(name = "flag2") LocalBooleanRef flag2
+            Operation<Void> original
     ) {
         if (!AcceleratedBlockEntityRenderingFeature.isEnabled()) {
             original.call(
@@ -64,9 +61,9 @@ public abstract class LevelRendererMixin {
             return;
         }
 
-        if (shouldShowEntityOutlines() && pBlockEntity.hasCustomOutlineRendering(minecraft.player)) {
-            flag2.set(true);
-        }
+//        if (shouldShowEntityOutlines() && pBlockEntity.hasCustomOutlineRendering(minecraft.player)) {
+//            flag2.set(true);
+//        }
 
         BlockPos blockPos = pBlockEntity.getBlockPos();
         MultiBufferSource bufferSource = CoreBuffers.CORE;

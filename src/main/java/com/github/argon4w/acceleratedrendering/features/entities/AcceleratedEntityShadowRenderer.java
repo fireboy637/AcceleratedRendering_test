@@ -5,7 +5,7 @@ import com.github.argon4w.acceleratedrendering.core.buffers.accelerated.renderer
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
@@ -73,7 +73,7 @@ public class AcceleratedEntityShadowRenderer implements IAcceleratedRenderer<Acc
             shadowTransparency = 255.0F;
         }
 
-        int shadowColor = FastColor.ARGB32.color((int) shadowTransparency, color);
+        int shadowColor = ARGB.color((int) shadowTransparency, color);
         AABB bounds = voxelShape.bounds();
 
         float minX = blockPos.getX() + (float) bounds.minX;

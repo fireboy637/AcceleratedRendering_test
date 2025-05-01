@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import org.lwjgl.system.MemoryUtil;
 
 public class MeshCollector implements VertexConsumer {
@@ -157,7 +157,7 @@ public class MeshCollector implements VertexConsumer {
         MemoryUtil.memPutFloat(vertexAddress + posOffset + 8L, pZ);
 
         if (colorOffset != -1L) {
-            MemoryUtil.memPutInt(vertexAddress + colorOffset + 0L, FastColor.ABGR32.fromArgb32(pColor));
+            MemoryUtil.memPutInt(vertexAddress + colorOffset + 0L, ARGB.toABGR(pColor));
         }
 
         if (uv0Offset != -1L) {

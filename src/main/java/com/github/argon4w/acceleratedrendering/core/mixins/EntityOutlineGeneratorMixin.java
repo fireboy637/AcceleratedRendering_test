@@ -6,6 +6,7 @@ import com.github.argon4w.acceleratedrendering.core.buffers.accelerated.renderer
 import com.github.argon4w.acceleratedrendering.core.buffers.accelerated.renderers.IAcceleratedRenderer;
 import com.github.argon4w.acceleratedrendering.core.buffers.graphs.IBufferGraph;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -16,11 +17,15 @@ import org.spongepowered.asm.mixin.Unique;
 
 import java.nio.ByteBuffer;
 
-@Mixin(targets = "net.minecraft.client.renderer.OutlineBufferSource$EntityOutlineGenerator")
+@Mixin(OutlineBufferSource.EntityOutlineGenerator.class)
 public class EntityOutlineGeneratorMixin implements IAcceleratedVertexConsumer {
 
-    @Shadow @Final private VertexConsumer delegate;
-    @Shadow @Final private int color;
+    @Shadow
+    @Final
+    private VertexConsumer delegate;
+    @Shadow
+    @Final
+    private int color;
 
     @Unique
     @Override
@@ -84,7 +89,7 @@ public class EntityOutlineGeneratorMixin implements IAcceleratedVertexConsumer {
 
     @Unique
     @Override
-    public <T>  void doRender(
+    public <T> void doRender(
             IAcceleratedRenderer<T> renderer,
             T context,
             Matrix4f transform,

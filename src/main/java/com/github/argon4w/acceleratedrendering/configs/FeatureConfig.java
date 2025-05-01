@@ -24,11 +24,6 @@ public class FeatureConfig {
     public final ModConfigSpec.ConfigValue<PipelineSetting> acceleratedTextRenderingDefaultPipeline;
     public final ModConfigSpec.ConfigValue<MeshType> acceleratedTextRenderingMeshType;
 
-    public final ModConfigSpec.ConfigValue<FeatureStatus> acceleratedItemRenderingFeatureStatus;
-    public final ModConfigSpec.ConfigValue<FeatureStatus> acceleratedItemRenderingBakeMeshForQuads;
-    public final ModConfigSpec.ConfigValue<PipelineSetting> acceleratedItemRenderingDefaultPipeline;
-    public final ModConfigSpec.ConfigValue<MeshType> acceleratedItemRenderingMeshType;
-
     public final ModConfigSpec.ConfigValue<FeatureStatus> acceleratedBlockEntityRenderingFeatureStatus;
     public final ModConfigSpec.ConfigValue<PipelineSetting> acceleratedBlockEntityRenderingDefaultPipeline;
     public final ModConfigSpec.ConfigValue<MeshType> acceleratedBlockEntityRenderingMeshType;
@@ -149,39 +144,6 @@ public class FeatureConfig {
                 .comment("- CLIENT: Cached mesh will be stored on the client side (CPU), which will use less VRAM but take more time to upload to the server side (GPU) during rendering.")
                 .comment("- SERVER: Cached mesh will be stored on the server side (GPU), which may speed up rendering but will use more VRAM to store the mesh.")
                 .translation("acceleratedrendering.configuration.accelerated_block_entity_rendering.mesh_type")
-                .defineEnum("mesh_type", MeshType.SERVER);
-
-        builder.pop();
-
-        builder
-                .comment("Accelerated Item Rendering Settings")
-                .comment("Accelerated Item Rendering uses GPU to cache and transform vertices while rendering item models, instead of generating and transforming vertices every time the item models are rendered in CPU.")
-                .translation("acceleratedrendering.configuration.accelerated_item_rendering")
-                .push("accelerated_item_rendering");
-
-        acceleratedItemRenderingFeatureStatus = builder
-                .comment("- DISABLED: Disable accelerated item rendering.")
-                .comment("- ENABLED: Enable accelerated item rendering.")
-                .translation("acceleratedrendering.configuration.accelerated_item_rendering.feature_status")
-                .defineEnum("feature_status", FeatureStatus.ENABLED);
-
-        acceleratedItemRenderingBakeMeshForQuads = builder
-                .comment("- DISABLED: Accelerated Rendering will not bake mesh for quads provided by dynamic item models (something that is not SimpleBakedModel) unless mods explicitly enable it temporarily when rendering their own item models.")
-                .comment("- ENABLED: Accelerated Rendering will bake mesh for all quads provided by dynamic item models (something that is not SimpleBakedModel) unless mods explicitly disable it temporarily when rendering their own item models, which will accelerate the rendering of these models but will crash if they keep allocating new quad data. (but who will?)")
-                .translation("acceleratedrendering.configuration.accelerated_item_rendering.bake_mesh_for_quads")
-                .defineEnum("bake_mesh_for_quads", FeatureStatus.ENABLED);
-
-        acceleratedItemRenderingDefaultPipeline = builder
-                .comment("- VANILLA: Item models will not be rendered into the accelerated pipeline unless mods explicitly enable it temporarily when rendering their own item models.")
-                .comment("- ACCELERATED: All item models will be rendered in the accelerated pipeline unless mods explicitly disable it temporarily when rendering their own item models.")
-                .translation("acceleratedrendering.configuration.accelerated_item_rendering.default_pipeline")
-                .defineEnum("default_pipeline", PipelineSetting.ACCELERATED);
-
-        acceleratedItemRenderingMeshType = builder
-                .gameRestart()
-                .comment("- CLIENT: Cached mesh will be stored on the client side (CPU), which will use less VRAM but take more time to upload to the server side (GPU) during rendering.")
-                .comment("- SERVER: Cached mesh will be stored on the server side (GPU), which may speed up rendering but will use more VRAM to store the mesh.")
-                .translation("acceleratedrendering.configuration.accelerated_item_rendering.mesh_type")
                 .defineEnum("mesh_type", MeshType.SERVER);
 
         builder.pop();

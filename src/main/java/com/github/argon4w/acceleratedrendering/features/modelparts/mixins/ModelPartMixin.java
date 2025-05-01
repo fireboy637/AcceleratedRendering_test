@@ -105,18 +105,18 @@ public class ModelPartMixin implements IAcceleratedRenderer<Void> {
 
         for (ModelPart.Cube cube : cubes) {
             for (ModelPart.Polygon polygon : cube.polygons) {
-                Vector3f polygonNormal = polygon.normal;
+                Vector3f polygonNormal = polygon.normal();
 
-                for (ModelPart.Vertex vertex : polygon.vertices) {
-                    Vector3f vertexPosition = vertex.pos;
+                for (ModelPart.Vertex vertex : polygon.vertices()) {
+                    Vector3f vertexPosition = vertex.pos();
 
                     meshBuilder.addVertex(
                             vertexPosition.x / 16.0f,
                             vertexPosition.y / 16.0f,
                             vertexPosition.z / 16.0f,
                             -1,
-                            vertex.u,
-                            vertex.v,
+                            vertex.u(),
+                            vertex.v(),
                             overlay,
                             0,
                             polygonNormal.x,

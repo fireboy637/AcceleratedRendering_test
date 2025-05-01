@@ -15,7 +15,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.lwjgl.system.MemoryUtil;
@@ -299,7 +299,7 @@ public class AcceleratedBufferBuilder implements IAcceleratedVertexConsumer, Ver
         MemoryUtil.memPutInt(varyingAddress + 2L * 4L, -1);
 
         if (colorOffset != -1) {
-            MemoryUtil.memPutInt(vertexAddress + colorOffset + 0L, FastColor.ABGR32.fromArgb32(pColor));
+            MemoryUtil.memPutInt(vertexAddress + colorOffset + 0L, ARGB.toABGR(pColor));
         }
 
         if (uv0Offset != -1) {
@@ -385,7 +385,7 @@ public class AcceleratedBufferBuilder implements IAcceleratedVertexConsumer, Ver
         );
 
         if (colorOffset != -1) {
-            MemoryUtil.memPutInt(vertexAddress + colorOffset, FastColor.ABGR32.fromArgb32(color));
+            MemoryUtil.memPutInt(vertexAddress + colorOffset, ARGB.toABGR(color));
         }
 
         if (uv1Offset != -1) {
@@ -424,7 +424,7 @@ public class AcceleratedBufferBuilder implements IAcceleratedVertexConsumer, Ver
         data.addExtraVarying(varyingAddress);
 
         if (colorOffset != -1) {
-            MemoryUtil.memPutInt(vertexAddress + colorOffset, FastColor.ABGR32.fromArgb32(color));
+            MemoryUtil.memPutInt(vertexAddress + colorOffset, ARGB.toABGR(color));
         }
 
         if (uv1Offset != -1) {

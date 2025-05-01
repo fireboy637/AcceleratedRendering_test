@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-@Mixin(AcceleratedBufferSource.class)
+@Mixin(value = AcceleratedBufferSource.class, remap = false)
 public abstract class AcceleratedBufferSourceMixin {
 
     @Shadow @Final private IBufferEnvironment bufferEnvironment;

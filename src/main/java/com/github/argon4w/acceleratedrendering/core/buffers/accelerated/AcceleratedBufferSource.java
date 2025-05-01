@@ -12,9 +12,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.CompiledShaderProgram;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.ShaderInstance;
 
 import java.util.Map;
 
@@ -136,7 +136,7 @@ public class AcceleratedBufferSource extends MultiBufferSource.BufferSource impl
 
             DrawContextPool.IndirectDrawContext drawContext = drawContexts.get(renderType);
             VertexFormat.Mode mode = renderType.mode;
-            ShaderInstance shader = RenderSystem.getShader();
+            CompiledShaderProgram shader = RenderSystem.getShader();
 
             shader.setDefaultUniforms(
                     mode,

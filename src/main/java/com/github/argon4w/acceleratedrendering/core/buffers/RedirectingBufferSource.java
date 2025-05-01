@@ -59,7 +59,7 @@ public class RedirectingBufferSource extends MultiBufferSource.BufferSource {
             return fallbackSource.getBuffer(pRenderType);
         }
 
-        if (fallbackNames.contains(pRenderType.name)) {
+        if (fallbackNames.contains(pRenderType.toString())) {
             return fallbackSource.getBuffer(pRenderType);
         }
 

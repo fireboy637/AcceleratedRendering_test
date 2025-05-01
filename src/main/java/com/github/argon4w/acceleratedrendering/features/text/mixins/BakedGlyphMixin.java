@@ -5,7 +5,6 @@ import com.github.argon4w.acceleratedrendering.features.text.AcceleratedBakedGly
 import com.github.argon4w.acceleratedrendering.features.text.AcceleratedTextRenderingFeature;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.font.glyphs.BakedGlyph;
-import net.minecraft.util.FastColor;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,17 +22,16 @@ public class BakedGlyphMixin {
     @Unique private final AcceleratedBakedGlyphRenderer normalRenderer = new AcceleratedBakedGlyphRenderer((BakedGlyph) (Object) this, false);
     @Unique private final AcceleratedBakedGlyphRenderer italicRenderer = new AcceleratedBakedGlyphRenderer((BakedGlyph) (Object) this, true);
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "render(ZFFFLorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;IZI)V", at = @At("HEAD"), cancellable = true)
     public void renderFast(
             boolean pItalic,
             float pX,
             float pY,
+            float pZ,
             Matrix4f pMatrix,
             VertexConsumer pBuffer,
-            float pRed,
-            float pGreen,
-            float pBlue,
-            float pAlpha,
+            int color,
+            boolean bold,
             int pPackedLight,
             CallbackInfo ci
     ) {
@@ -56,13 +54,6 @@ public class BakedGlyphMixin {
         TRANSFORM
                 .set(pMatrix)
                 .translate(pX, pY, 0.0f);
-
-        int color = FastColor.ABGR32.color(
-                (int) (pAlpha * 255.0F),
-                (int) (pBlue * 255.0F),
-                (int) (pGreen * 255.0F),
-                (int) (pRed * 255.0F)
-        );
 
         AcceleratedBakedGlyphRenderer renderer = pItalic
                 ? italicRenderer

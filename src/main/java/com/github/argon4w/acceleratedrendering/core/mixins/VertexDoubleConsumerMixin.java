@@ -4,6 +4,7 @@ import com.github.argon4w.acceleratedrendering.core.buffers.accelerated.builders
 import com.github.argon4w.acceleratedrendering.core.buffers.accelerated.renderers.IAcceleratedRenderer;
 import com.github.argon4w.acceleratedrendering.core.buffers.graphs.IBufferGraph;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexMultiConsumer;
 import net.minecraft.client.renderer.RenderType;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -14,11 +15,15 @@ import org.spongepowered.asm.mixin.Unique;
 
 import java.nio.ByteBuffer;
 
-@Mixin(targets = "com.mojang.blaze3d.vertex.VertexMultiConsumer$Double")
+@Mixin(VertexMultiConsumer.Double.class)
 public class VertexDoubleConsumerMixin implements IAcceleratedVertexConsumer {
 
-    @Shadow @Final private VertexConsumer first;
-    @Shadow @Final private VertexConsumer second;
+    @Shadow
+    @Final
+    private VertexConsumer first;
+    @Shadow
+    @Final
+    private VertexConsumer second;
 
     @Unique
     @Override
@@ -82,7 +87,7 @@ public class VertexDoubleConsumerMixin implements IAcceleratedVertexConsumer {
 
     @Unique
     @Override
-    public <T>  void doRender(
+    public <T> void doRender(
             IAcceleratedRenderer<T> renderer,
             T context,
             Matrix4f transform,
