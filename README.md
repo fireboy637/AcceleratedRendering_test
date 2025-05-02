@@ -1,27 +1,29 @@
+# AccleratedRendering (Ported)
+A fork of [AcceleratedRendering](https://github.com/Argon4W/AcceleratedRendering) that has been ported to newer Minecraft versions.
 
-Installation information
-=======
+Currently this project is maintaining for:
+ - Fabric 1.21.4
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions at [github](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+> [!WARNING]
+> **Use with Caution!**  
+> This mod is still under development & experimental, issues may raise.
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+## Lacking Upstream Features
+ - Item Rendering Acceleration ([Source](https://github.com/Argon4W/AcceleratedRendering/tree/main/src/main/java/com/github/argon4w/acceleratedrendering/features/items))
+   - Mojang has refactored their item-rendering related code in 1.21.4, and current code structure is unsuitable.
 
-> **Note**: For Eclipse, use tasks in `Launch Group` instead of ones founds in `Java Application`. A preparation task must run before launching the game. NeoGradle uses launch groups to do these subsequently.
+## Optional Dependencies
+ - [Cloth Config](https://modrinth.com/mod/cloth-config) and [Mod Menu](https://modrinth.com/mod/modmenu)
+   - Required to open the config screen (Yes we ported the config).
+ - [Iris](https://modrinth.com/mod/iris)
+   - Compatibility options for Iris mod are provided.
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
+## Where to Get
+You can download this mod from [Releases](https://github.com/XIAYM-gh/AcceleratedRendering-Ported/releases), or you can build it yourself.
 
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+## License
+This mod is licensed under [MIT License](/LICENSE).
 
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+## Reference & Special Thanks
+ - [ZhuRuoLing/AcceleratedRendering-reFabricated](https://github.com/ZhuRuoLing/AcceleratedRendering-reFabricated)
+ - [Luna5ama/AcceleratedRendering@1.21.4-port](https://github.com/Luna5ama/AcceleratedRendering/tree/1.21.4-port)
