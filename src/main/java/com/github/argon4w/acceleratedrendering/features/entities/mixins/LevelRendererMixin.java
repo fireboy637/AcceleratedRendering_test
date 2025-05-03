@@ -9,6 +9,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -35,7 +37,11 @@ public abstract class LevelRendererMixin {
             MultiBufferSource pBufferSource,
             Operation<Void> original
     ) {
-        if (!AcceleratedEntityRenderingFeature.isEnabled()) {
+        if (!AcceleratedEntityRenderingFeature.isEnabled() ||
+                // Workaround for a rendering glitch
+                (pEntity instanceof LivingEntity livingEntity &&
+                        (livingEntity.getMainHandItem().isEnchanted() || livingEntity.getOffhandItem().isEnchanted()))
+                || (pEntity instanceof ItemEntity itemEntity && itemEntity.getItem().isEnchanted())) {
             original.call(
                     instance,
                     pEntity,
