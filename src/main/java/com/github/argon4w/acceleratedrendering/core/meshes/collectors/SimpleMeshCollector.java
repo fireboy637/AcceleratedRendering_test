@@ -5,7 +5,7 @@ import com.github.argon4w.acceleratedrendering.core.buffers.memory.IMemoryLayout
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 
 public class SimpleMeshCollector implements VertexConsumer, IMeshCollector {
 
@@ -138,7 +138,7 @@ public class SimpleMeshCollector implements VertexConsumer, IMeshCollector {
         posOffset.putFloat(vertexAddress + 0L, pX);
         posOffset.putFloat(vertexAddress + 4L, pY);
         posOffset.putFloat(vertexAddress + 8L, pZ);
-        colorOffset.putInt(vertexAddress, FastColor.ABGR32.fromArgb32(pColor));
+        colorOffset.putInt(vertexAddress, ARGB.toABGR(pColor));
         uv0Offset.putFloat(vertexAddress + 0L, pU);
         uv0Offset.putFloat(vertexAddress + 4L, pV);
         uv2Offset.putInt(vertexAddress, pPackedLight);

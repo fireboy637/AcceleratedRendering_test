@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-@Mixin(AcceleratedBufferSource.class)
+@Mixin(value = AcceleratedBufferSource.class, remap = false)
 public class AcceleratedBufferSourceMixin {
 
     @ModifyArg(
@@ -16,7 +16,8 @@ public class AcceleratedBufferSourceMixin {
                     value = "INVOKE",
                     target = "Lcom/github/argon4w/acceleratedrendering/core/buffers/accelerated/builders/AcceleratedBufferBuilder;<init>(Lcom/github/argon4w/acceleratedrendering/core/buffers/accelerated/pools/StagingBufferPool$StagingBuffer;Lcom/github/argon4w/acceleratedrendering/core/buffers/accelerated/pools/StagingBufferPool$StagingBuffer;Lcom/github/argon4w/acceleratedrendering/core/buffers/accelerated/pools/ElementBufferPool$ElementSegment;Lcom/github/argon4w/acceleratedrendering/core/buffers/accelerated/AcceleratedBufferSetPool$BufferSet;Lnet/minecraft/client/renderer/RenderType;)V"
             ),
-            index = 4
+            index = 4,
+            remap = true
     )
     public RenderType unwrapIrisRenderType(RenderType renderType) {
         return renderType instanceof WrappableRenderType wrapped ? wrapped.unwrap() : renderType;

@@ -38,13 +38,13 @@ public class AcceleratedBufferSources {
 
     public VertexConsumer get(RenderType pRenderType) {
         if (pRenderType != null
-                && (CoreFeature.shouldForceAccelerateTranslucent() || canSort || !pRenderType.sortOnUpload)
-                && validModes.contains(pRenderType.mode)
+                && (CoreFeature.shouldForceAccelerateTranslucent() || canSort || !pRenderType.sortOnUpload())
+                && validModes.contains(pRenderType.mode())
                 && !invalidNames.contains(pRenderType.name)
-                && sources.containsKey(pRenderType.format)
+                && sources.containsKey(pRenderType.format())
         ) {
             return sources
-                    .get(pRenderType.format)
+                    .get(pRenderType.format())
                     .getBuffer(pRenderType);
         }
 

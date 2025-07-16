@@ -11,7 +11,7 @@ import com.github.argon4w.acceleratedrendering.core.utils.SimpleResetPool;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import lombok.Getter;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 
 import static org.lwjgl.opengl.GL43.GL_SHADER_STORAGE_BUFFER;
 
@@ -104,7 +104,7 @@ public class MeshUploaderPool extends SimpleResetPool<MeshUploaderPool.MeshUploa
             data.addExtraVarying(extraVaryingAddress);
 
             MESH_INFO_SHARING.putInt(meshInfoAddress, sharing);
-            MESH_INFO_COLOR.putInt(meshInfoAddress, FastColor.ABGR32.fromArgb32(color));
+            MESH_INFO_COLOR.putInt(meshInfoAddress, ARGB.toABGR(color));
             MESH_INFO_UV1.putInt(meshInfoAddress, overlay);
             MESH_INFO_UV2.putInt(meshInfoAddress, light);
 

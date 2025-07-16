@@ -123,7 +123,7 @@ public class AcceleratedBufferSource extends MultiBufferSource.BufferSource impl
                     continue;
                 }
 
-                var mode = renderType.mode;
+                var mode = renderType.mode();
                 var drawContext = bufferSet.getDrawContext();
 
                 drawContext.bindComputeBuffers(bufferSet.getElementBuffer(), elementSegment);
@@ -143,7 +143,7 @@ public class AcceleratedBufferSource extends MultiBufferSource.BufferSource impl
 
                 var drawContext = drawContexts.get(renderType);
                 var shader = RenderSystem.getShader();
-                var mode = renderType.mode;
+                var mode = renderType.mode();
 
                 shader.setDefaultUniforms(
                         mode,

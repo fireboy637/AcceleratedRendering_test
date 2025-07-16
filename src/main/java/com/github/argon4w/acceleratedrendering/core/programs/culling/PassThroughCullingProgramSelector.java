@@ -13,7 +13,7 @@ public class PassThroughCullingProgramSelector implements ICullingProgramSelecto
 
     @Override
     public IPolygonProgramDispatcher select(RenderType renderType) {
-        VertexFormat.Mode mode = renderType.mode;
+        VertexFormat.Mode mode = renderType.mode();
 
         if (mode == VertexFormat.Mode.QUADS) {
             return PassThroughCullingProgramDispatcher.QUAD;

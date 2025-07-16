@@ -35,10 +35,6 @@ public class FeatureConfig {
     public final EnumReference<PipelineSetting> acceleratedEntityRenderingDefaultPipeline = new EnumReference<>(PipelineSetting.ACCELERATED);
     public final EnumReference<MeshType> acceleratedEntityRenderingMeshType = new EnumReference<>(MeshType.SERVER);
 
-    public final EnumReference<FeatureStatus> acceleratedBlockEntityRenderingFeatureStatus = new EnumReference<>(FeatureStatus.ENABLED);
-    public final EnumReference<PipelineSetting> acceleratedBlockEntityRenderingDefaultPipeline = new EnumReference<>(PipelineSetting.ACCELERATED);
-    public final EnumReference<MeshType> acceleratedBlockEntityRenderingMeshType = new EnumReference<>(MeshType.SERVER);
-
     public final EnumReference<FeatureStatus> acceleratedTextRenderingFeatureStatus = new EnumReference<>(FeatureStatus.ENABLED);
     public final EnumReference<PipelineSetting> acceleratedTextRenderingDefaultPipeline = new EnumReference<>(PipelineSetting.ACCELERATED);
     public final EnumReference<MeshType> acceleratedTextRenderingMeshType = new EnumReference<>(MeshType.SERVER);
@@ -50,9 +46,7 @@ public class FeatureConfig {
     public final EnumReference<FeatureStatus> irisCompatFeatureStatus = new EnumReference<>(FeatureStatus.ENABLED);
     public final EnumReference<FeatureStatus> irisCompatOrientationCullingCompat = new EnumReference<>(FeatureStatus.ENABLED);
     public final EnumReference<FeatureStatus> irisCompatShadowCulling = new EnumReference<>(FeatureStatus.ENABLED);
-    public final EnumReference<FeatureStatus> irisCompatEntitiesCompat = new EnumReference<>(FeatureStatus.ENABLED);
     public final EnumReference<FeatureStatus> irisCompatPolygonProcessing = new EnumReference<>(FeatureStatus.ENABLED);
-    public final EnumReference<FeatureStatus> irisCompatFastRenderTypeCheck = new EnumReference<>(FeatureStatus.ENABLED);
 
     // Welcome to hell
     public Screen createConfigScreen(Screen parent) {
@@ -130,28 +124,6 @@ public class FeatureConfig {
                         .setSaveConsumer(acceleratedEntityRenderingMeshType::set)
                         .build());
 
-        // Accelerated Block Entity Rendering Settings
-        builder.getOrCreateCategory(Component.translatable("acceleratedrendering.configuration.accelerated_block_entity_rendering"))
-                .addEntry(builder.entryBuilder()
-                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.accelerated_block_entity_rendering.feature_status"), FeatureStatus.class, acceleratedBlockEntityRenderingFeatureStatus.get())
-                        .setDefaultValue(defaultConfig.acceleratedBlockEntityRenderingFeatureStatus.get())
-                        .setTooltip(Component.translatable("acceleratedrendering.configuration.accelerated_block_entity_rendering.feature_status.tooltip"))
-                        .setSaveConsumer(acceleratedBlockEntityRenderingFeatureStatus::set)
-                        .build())
-                .addEntry(builder.entryBuilder()
-                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.accelerated_block_entity_rendering.default_pipeline"), PipelineSetting.class, acceleratedBlockEntityRenderingDefaultPipeline.get())
-                        .setDefaultValue(defaultConfig.acceleratedBlockEntityRenderingDefaultPipeline.get())
-                        .setTooltip(Component.translatable("acceleratedrendering.configuration.accelerated_block_entity_rendering.default_pipeline.tooltip"))
-                        .setSaveConsumer(acceleratedBlockEntityRenderingDefaultPipeline::set)
-                        .build())
-                .addEntry(builder.entryBuilder()
-                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.accelerated_block_entity_rendering.mesh_type"), MeshType.class, acceleratedBlockEntityRenderingMeshType.get())
-                        .requireRestart()
-                        .setDefaultValue(defaultConfig.acceleratedBlockEntityRenderingMeshType.get())
-                        .setTooltip(Component.translatable("acceleratedrendering.configuration.accelerated_block_entity_rendering.mesh_type.tooltip"))
-                        .setSaveConsumer(acceleratedBlockEntityRenderingMeshType::set)
-                        .build());
-
         // Accelerated Text Rendering Settings
         builder.getOrCreateCategory(Component.translatable("acceleratedrendering.configuration.accelerated_text_rendering"))
                 .addEntry(builder.entryBuilder()
@@ -216,22 +188,10 @@ public class FeatureConfig {
                         .setSaveConsumer(irisCompatShadowCulling::set)
                         .build())
                 .addEntry(builder.entryBuilder()
-                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.iris_compatibility.entities_compatibility"), FeatureStatus.class, irisCompatEntitiesCompat.get())
-                        .setDefaultValue(defaultConfig.irisCompatEntitiesCompat.get())
-                        .setTooltip(Component.translatable("acceleratedrendering.configuration.iris_compatibility.entities_compatibility.tooltip"))
-                        .setSaveConsumer(irisCompatEntitiesCompat::set)
-                        .build())
-                .addEntry(builder.entryBuilder()
                         .startEnumSelector(Component.translatable("acceleratedrendering.configuration.iris_compatibility.polygon_processing"), FeatureStatus.class, irisCompatPolygonProcessing.get())
                         .setDefaultValue(defaultConfig.irisCompatPolygonProcessing.get())
                         .setTooltip(Component.translatable("acceleratedrendering.configuration.iris_compatibility.polygon_processing.tooltip"))
                         .setSaveConsumer(irisCompatPolygonProcessing::set)
-                        .build())
-                .addEntry(builder.entryBuilder()
-                        .startEnumSelector(Component.translatable("acceleratedrendering.configuration.iris_compatability.fast_render_type_check"), FeatureStatus.class, irisCompatFastRenderTypeCheck.get())
-                        .setDefaultValue(defaultConfig.irisCompatFastRenderTypeCheck.get())
-                        .setTooltip(Component.translatable("acceleratedrendering.configuration.iris_compatability.fast_render_type_check.tooltip"))
-                        .setSaveConsumer(irisCompatFastRenderTypeCheck::set)
                         .build());
 
         return builder.build();

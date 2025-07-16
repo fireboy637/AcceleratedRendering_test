@@ -18,13 +18,12 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
-import java.util.Collection;
 import java.util.Map;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -95,7 +94,7 @@ public class AcceleratedBufferBuilder implements IAcceleratedVertexConsumer, Ver
 
         this.layout = bufferSet.getLayout();
         this.renderType = renderType;
-        this.mode = this.renderType.mode;
+        this.mode = this.renderType.mode();
         this.vertexSize = this.bufferSet.getVertexSize();
         this.polygonSize = this.mode.primitiveLength;
         this.polygonElementCount = this.mode.indexCount(this.polygonSize);
@@ -297,7 +296,7 @@ public class AcceleratedBufferBuilder implements IAcceleratedVertexConsumer, Ver
         posOffset.putFloat(vertexAddress + 0L, pX);
         posOffset.putFloat(vertexAddress + 4L, pY);
         posOffset.putFloat(vertexAddress + 8L, pZ);
-        colorOffset.putInt(vertexAddress, FastColor.ABGR32.fromArgb32(pColor));
+        colorOffset.putInt(vertexAddress, ARGB.toABGR(pColor));
         uv0Offset.putFloat(vertexAddress + 0L, pU);
         uv0Offset.putFloat(vertexAddress + 4L, pV);
         uv1Offset.putInt(vertexAddress, pPackedOverlay);
@@ -370,7 +369,7 @@ public class AcceleratedBufferBuilder implements IAcceleratedVertexConsumer, Ver
                 bufferSize
         );
 
-        colorOffset.putInt(vertexAddress, FastColor.ABGR32.fromArgb32(color));
+        colorOffset.putInt(vertexAddress, ARGB.toABGR(color));
         uv1Offset.putInt(vertexAddress, overlay);
         uv2Offset.putInt(vertexAddress, light);
         VARYING_SHARING.putInt(varyingAddress, activeSharing);

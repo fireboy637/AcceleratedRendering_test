@@ -38,7 +38,7 @@ public class IrisCullingProgramSelector implements ICullingProgramSelector {
                 && (IrisCompatFeature.isShadowCullingEnabled() || !ShadowRenderingState.areShadowsCurrentlyBeingRendered())
                 && OrientationCullingFeature.isEnabled()
                 && (OrientationCullingFeature.shouldIgnoreCullState() || RenderTypeUtils.isCulled(renderType))
-                && this.mode.equals(renderType.mode)
+                && this.mode.equals(renderType.mode())
                 ? dispatcher
                 : parent.select(renderType);
     }

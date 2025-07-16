@@ -32,7 +32,7 @@ public class OrientationCullingProgramSelector implements ICullingProgramSelecto
     public IPolygonProgramDispatcher select(RenderType renderType) {
         return OrientationCullingFeature.isEnabled()
                 && (OrientationCullingFeature.shouldIgnoreCullState() || RenderTypeUtils.isCulled(renderType))
-                && this.mode.equals(renderType.mode)
+                && this.mode.equals(renderType.mode())
                 ? dispatcher
                 : parent.select(renderType);
     }

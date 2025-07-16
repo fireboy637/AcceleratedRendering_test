@@ -8,7 +8,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import lombok.experimental.ExtensionMethod;
 import net.minecraft.client.gui.font.glyphs.BakedGlyph;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,17 +26,16 @@ public class BakedGlyphMixin {
     @Unique
     private final AcceleratedBakedGlyphRenderer italicRenderer = new AcceleratedBakedGlyphRenderer((BakedGlyph) (Object) this, true);
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "render(ZFFFLorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;IZI)V", at = @At("HEAD"), cancellable = true)
     public void renderFast(
             boolean pItalic,
             float pX,
             float pY,
+            float pZ,
             Matrix4f pMatrix,
             VertexConsumer pBuffer,
-            float pRed,
-            float pGreen,
-            float pBlue,
-            float pAlpha,
+            int pColor,
+            boolean pBold,
             int pPackedLight,
             CallbackInfo ci
     ) {
@@ -49,13 +48,6 @@ public class BakedGlyphMixin {
         ) {
             ci.cancel();
 
-            var color = FastColor.ABGR32.color(
-                    (int) (pAlpha * 255.0F),
-                    (int) (pBlue * 255.0F),
-                    (int) (pGreen * 255.0F),
-                    (int) (pRed * 255.0F)
-            );
-
             var renderer = pItalic
                     ? italicRenderer
                     : normalRenderer;
@@ -67,7 +59,7 @@ public class BakedGlyphMixin {
                     null,
                     pPackedLight,
                     OverlayTexture.NO_OVERLAY,
-                    color
+                    ARGB.toABGR(pColor)
             );
         }
     }

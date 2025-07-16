@@ -3,11 +3,11 @@ package com.github.argon4w.acceleratedrendering.compat.iris.mixins.vanilla;
 import com.github.argon4w.acceleratedrendering.core.CoreBuffers;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,14 +29,7 @@ public class LevelRendererMixin {
             )
     )
     public void drawIrisCoreBuffers(
-            DeltaTracker pDeltaTracker,
-            boolean pRenderBlockOutline,
-            Camera pCamera,
-            GameRenderer pGameRenderer,
-            LightTexture pLightTexture,
-            Matrix4f pFrustumMatrix,
-            Matrix4f pProjectionMatrix,
-            CallbackInfo ci
+            GraphicsResourceAllocator graphicsResourceAllocator, DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, Matrix4f frustumMatrix, Matrix4f projectionMatrix, CallbackInfo ci
     ) {
         CoreBuffers.ENTITY.drawBuffers();
         CoreBuffers.BLOCK.drawBuffers();
@@ -47,7 +40,7 @@ public class LevelRendererMixin {
     }
 
     @WrapOperation(
-            method = "renderLevel",
+            method = "method_62214" /* Lambda */,
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endLastBatch()V"

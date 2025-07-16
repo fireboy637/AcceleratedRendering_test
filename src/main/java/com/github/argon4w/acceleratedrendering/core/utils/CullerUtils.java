@@ -1,7 +1,7 @@
 package com.github.argon4w.acceleratedrendering.core.utils;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
@@ -54,7 +54,7 @@ public class CullerUtils {
 
         for (var x = minX; x < maxX; x++) {
             for (var y = minY; y < maxY; y++) {
-                if (FastColor.ABGR32.alpha(texture.getPixelRGBA(x, y)) != 0) {
+                if (ARGB.alpha(texture.getPixel(x, y)) != 0) {
                     return false;
                 }
             }

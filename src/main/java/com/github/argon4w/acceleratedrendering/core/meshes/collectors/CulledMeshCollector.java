@@ -21,7 +21,7 @@ public class CulledMeshCollector implements VertexConsumer, IMeshCollector {
     private int vertexIndex;
 
     public CulledMeshCollector(RenderType renderType, IMemoryLayout<VertexFormatElement> layout) {
-        this.polygonSize = renderType.mode.primitiveLength;
+        this.polygonSize = renderType.mode().primitiveLength;
         this.polygon = new Vertex[this.polygonSize];
         this.texture = TextureUtils.downloadTexture(renderType, 0);
         this.meshCollector = new SimpleMeshCollector(layout);

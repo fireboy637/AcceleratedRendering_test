@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.RenderType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(AcceleratedBufferSources.class)
+@Mixin(value = AcceleratedBufferSources.class, remap = false)
 public class AcceleratedBufferSourceSetMixin {
 
     @WrapOperation(
@@ -16,7 +16,8 @@ public class AcceleratedBufferSourceSetMixin {
             at = @At(
                     value = "FIELD",
                     target = "Lnet/minecraft/client/renderer/RenderType;name:Ljava/lang/String;"
-            )
+            ),
+            remap = true
     )
     public String unwrapIrisRenderType(RenderType instance, Operation<String> original) {
         return original.call(instance instanceof WrappableRenderType wrapped ? wrapped.unwrap() : instance);

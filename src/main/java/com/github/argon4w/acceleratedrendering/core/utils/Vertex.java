@@ -1,7 +1,7 @@
 package com.github.argon4w.acceleratedrendering.core.utils;
 
 import lombok.Getter;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
@@ -29,7 +29,7 @@ public class Vertex {
     }
 
     public int getPackedColor() {
-        return FastColor.ARGB32.color(
+        return ARGB.color(
                 color.w,
                 color.x,
                 color.y,

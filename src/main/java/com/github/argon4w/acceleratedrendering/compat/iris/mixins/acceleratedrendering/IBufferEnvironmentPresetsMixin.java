@@ -8,28 +8,11 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.irisshaders.iris.vertices.IrisVertexFormats;
 import org.objectweb.asm.Opcodes;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(IBufferEnvironment.Presets.class)
+@Mixin(value = IBufferEnvironment.Presets.class, remap = false)
 public class IBufferEnvironmentPresetsMixin {
-
-    @Mutable
-    @Shadow
-    @Final
-    public static IBufferEnvironment BLOCK;
-    @Mutable
-    @Shadow
-    @Final
-    public static IBufferEnvironment ENTITY;
-    @Mutable
-    @Shadow
-    @Final
-    public static IBufferEnvironment POS_COLOR_TEX_LIGHT;
-
     @WrapOperation(
             method = "<clinit>",
             at = @At(

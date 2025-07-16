@@ -1,27 +1,23 @@
 package com.github.argon4w.acceleratedrendering;
 
 import com.github.argon4w.acceleratedrendering.configs.FeatureConfig;
-import com.mojang.logging.LogUtils;
-import net.neoforged.api.distmarker.Dist;
+import com.github.argon4w.acceleratedrendering.core.programs.ComputeShaderPrograms;
+import com.github.argon4w.acceleratedrendering.features.culling.OrientationCullingPrograms;
+import net.fabricmc.api.ClientModInitializer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
-import org.slf4j.Logger;
+import net.neoforged.fml.ModLoader;
 
-@Mod(
-        value = AcceleratedRenderingModEntry.MOD_ID,
-        dist = Dist.CLIENT
-)
-public class AcceleratedRenderingModEntry {
-
+public class AcceleratedRenderingModEntry implements ClientModInitializer {
     public static final String MOD_ID = "acceleratedrendering";
-    public static final Logger LOGGER = LogUtils.getLogger();
 
-    public AcceleratedRenderingModEntry(IEventBus modEventBus, ModContainer modContainer) {
-        modContainer.registerConfig(ModConfig.Type.CLIENT, FeatureConfig.SPEC);
-        modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+    @Override
+    public void onInitializeClient() {
+        FeatureConfig.CONFIG.loadConfig();
+
+        ModContainer container = ModLoader.createModContainer(MOD_ID);
+        IEventBus eventBus = container.getModEventBus();
+        eventBus.register(ComputeShaderPrograms.class);
+        eventBus.register(OrientationCullingPrograms.class);
     }
 }
