@@ -8,8 +8,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.system.MemoryStack;
 
-import java.nio.IntBuffer;
-
 import static org.lwjgl.opengl.GL46.*;
 
 public class TextureUtils {
@@ -17,14 +15,13 @@ public class TextureUtils {
     private static final Object2ObjectLinkedOpenHashMap<ResourceLocation, NativeImage> IMAGES = new Object2ObjectLinkedOpenHashMap<>();
 
     public static NativeImage downloadTexture(RenderType renderType, int mipmapLevel) {
-        ResourceLocation textureResourceLocation = RenderTypeUtils.getTextureLocation(renderType);
+        var textureResourceLocation = RenderTypeUtils.getTextureLocation(renderType);
 
         if (textureResourceLocation == null) {
             return null;
         }
 
-
-        NativeImage image = IMAGES.getAndMoveToFirst(textureResourceLocation);
+        var image = IMAGES.getAndMoveToFirst(textureResourceLocation);
 
         if (image != null) {
             return image;
@@ -36,9 +33,9 @@ public class TextureUtils {
                 .getTexture(textureResourceLocation)
                 .bind();
 
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer widthBuffer = stack.callocInt(1);
-            IntBuffer heightBuffer = stack.callocInt(1);
+        try (var stack = MemoryStack.stackPush()) {
+            var widthBuffer = stack.callocInt(1);
+            var heightBuffer = stack.callocInt(1);
 
             glGetTexLevelParameteriv(
                     GL_TEXTURE_2D,
@@ -54,25 +51,26 @@ public class TextureUtils {
                     heightBuffer
             );
 
-            int width = widthBuffer.get(0);
-            int height = heightBuffer.get(0);
+            var width = widthBuffer.get(0);
+            var height = heightBuffer.get(0);
 
             if (width == 0 || height == 0) {
                 return null;
             }
 
-            NativeImage nativeImage = new NativeImage(
+            var nativeImage = new NativeImage(
                     width,
                     height,
                     false
             );
 
             nativeImage.downloadTexture(mipmapLevel, false);
-
             IMAGES.putAndMoveToFirst(textureResourceLocation, nativeImage);
 
             if (IMAGES.size() > CoreFeature.getCachedImageSize()) {
-                IMAGES.removeLast().close();
+                IMAGES
+                        .removeLast()
+                        .close();
             }
 
             return nativeImage;

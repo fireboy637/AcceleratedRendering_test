@@ -1,10 +1,9 @@
 package com.github.argon4w.acceleratedrendering.core.buffers.accelerated.builders;
 
-import com.github.argon4w.acceleratedrendering.core.buffers.accelerated.renderers.IAcceleratedRenderer;
-import com.github.argon4w.acceleratedrendering.core.buffers.graphs.DecalBufferGraph;
-import com.github.argon4w.acceleratedrendering.core.buffers.graphs.IBufferGraph;
+import com.github.argon4w.acceleratedrendering.core.meshes.ServerMesh;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.RenderType;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.ExtensionMethod;
 import net.minecraft.core.Direction;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -12,9 +11,16 @@ import org.joml.Vector3f;
 
 import java.nio.ByteBuffer;
 
-public class AcceleratedSheetedDecalTextureGenerator implements IAcceleratedVertexConsumer, VertexConsumer {
+@ExtensionMethod(VertexConsumerExtension.class)
+@EqualsAndHashCode(
+        onlyExplicitlyIncluded = true,
+        callSuper = false
+)
+public class AcceleratedSheetedDecalTextureGenerator extends AcceleratedVertexConsumerWrapper {
 
+    @EqualsAndHashCode.Include
     private final VertexConsumer delegate;
+    @EqualsAndHashCode.Include
     private final Matrix4f cameraInverse;
     private final Matrix3f normalInverse;
     private final float textureScale;
@@ -46,28 +52,20 @@ public class AcceleratedSheetedDecalTextureGenerator implements IAcceleratedVert
     }
 
     @Override
-    public void beginTransform(Matrix4f transform, Matrix3f normal) {
-        ((IAcceleratedVertexConsumer) delegate).beginTransform(transform, normal);
+    protected VertexConsumer getDelegate() {
+        return delegate;
     }
 
     @Override
-    public void endTransform() {
-        ((IAcceleratedVertexConsumer) delegate).endTransform();
-    }
-
-    @Override
-    public boolean isAccelerated() {
-        return ((IAcceleratedVertexConsumer) delegate).isAccelerated();
-    }
-
-    @Override
-    public IBufferGraph getBufferGraph() {
-        return new DecalBufferGraph(((IAcceleratedVertexConsumer) delegate).getBufferGraph(), cameraInverse);
-    }
-
-    @Override
-    public RenderType getRenderType() {
-        return ((IAcceleratedVertexConsumer) delegate).getRenderType();
+    public VertexConsumer decorate(VertexConsumer buffer) {
+        return new AcceleratedSheetedDecalTextureGenerator(
+                getDelegate()
+                        .getAccelerated()
+                        .decorate(buffer),
+                cameraInverse,
+                normalInverse,
+                textureScale
+        );
     }
 
     @Override
@@ -78,51 +76,32 @@ public class AcceleratedSheetedDecalTextureGenerator implements IAcceleratedVert
             int light,
             int overlay
     ) {
-        ((IAcceleratedVertexConsumer) delegate).addClientMesh(
-                meshBuffer,
-                size,
-                -1,
-                light,
-                overlay
-        );
+        getDelegate()
+                .getAccelerated()
+                .addClientMesh(
+                        meshBuffer,
+                        size,
+                        -1,
+                        light,
+                        overlay
+                );
     }
 
     @Override
     public void addServerMesh(
-            int offset,
-            int size,
+            ServerMesh serverMesh,
             int color,
             int light,
             int overlay
     ) {
-        ((IAcceleratedVertexConsumer) delegate).addServerMesh(
-                offset,
-                size,
-                -1,
-                light,
-                overlay
-        );
-    }
-
-    @Override
-    public <T> void doRender(
-            IAcceleratedRenderer<T> renderer,
-            T context,
-            Matrix4f transform,
-            Matrix3f normal,
-            int light,
-            int overlay,
-            int color
-    ) {
-        renderer.render(
-                this,
-                context,
-                transform,
-                normal,
-                light,
-                overlay,
-                color
-        );
+        getDelegate()
+                .getAccelerated()
+                .addServerMesh(
+                        serverMesh,
+                        -1,
+                        light,
+                        overlay
+                );
     }
 
     @Override
@@ -149,18 +128,6 @@ public class AcceleratedSheetedDecalTextureGenerator implements IAcceleratedVert
     }
 
     @Override
-    public VertexConsumer setUv1(int pU, int pV) {
-        delegate.setUv1(pU, pV);
-        return this;
-    }
-
-    @Override
-    public VertexConsumer setUv2(int pU, int pV) {
-        delegate.setUv2(pU, pV);
-        return this;
-    }
-
-    @Override
     public VertexConsumer setColor(
             int pRed,
             int pGreen,
@@ -183,21 +150,21 @@ public class AcceleratedSheetedDecalTextureGenerator implements IAcceleratedVert
                 pNormalZ
         );
 
-        Vector3f normal = normalInverse.transform(
+        var normal = normalInverse.transform(
                 pNormalX,
                 pNormalY,
                 pNormalZ,
                 cachedNormal
         );
 
-        Vector3f camera = cameraInverse.transformPosition(
+        var camera = cameraInverse.transformPosition(
                 vertexX,
                 vertexY,
                 vertexZ,
                 cachedCamera
         );
 
-        Direction direction = Direction.getNearest(
+        var direction = Direction.getNearest(
                 (int) normal.x(),
                 (int) normal.y(),
                 (int) normal.z(),
@@ -213,12 +180,25 @@ public class AcceleratedSheetedDecalTextureGenerator implements IAcceleratedVert
     }
 
     @Override
-    public VertexConsumer decorate(VertexConsumer buffer) {
-        return new AcceleratedSheetedDecalTextureGenerator(
-                ((IAcceleratedVertexConsumer) delegate).decorate(buffer),
-                cameraInverse,
-                normalInverse,
-                textureScale
-        );
+    public void addVertex(
+            float x,
+            float y,
+            float z,
+            int color,
+            float u,
+            float v,
+            int packedOverlay,
+            int packedLight,
+            float normalX,
+            float normalY,
+            float normalZ
+    ) {
+        this
+                .addVertex(x, y, z)
+                .setColor(color)
+                .setUv(u, v)
+                .setOverlay(packedOverlay)
+                .setLight(packedLight)
+                .setNormal(normalX, normalY, normalZ);
     }
 }

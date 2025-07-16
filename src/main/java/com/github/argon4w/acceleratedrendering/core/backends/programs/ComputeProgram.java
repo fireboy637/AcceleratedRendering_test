@@ -1,7 +1,10 @@
 package com.github.argon4w.acceleratedrendering.core.backends.programs;
 
+import lombok.Getter;
+
 import static org.lwjgl.opengl.GL46.*;
 
+@Getter
 public class ComputeProgram {
 
     private final int programHandle;
@@ -12,11 +15,15 @@ public class ComputeProgram {
         this.barrierFlags = barrierFlags;
     }
 
-    public void dispatch(int count) {
+    public void dispatch(
+            int countX,
+            int countY,
+            int countZ
+    ) {
         glDispatchCompute(
-                count,
-                1,
-                1
+                countX,
+                countY,
+                countZ
         );
     }
 
@@ -41,10 +48,6 @@ public class ComputeProgram {
         glMemoryBarrier(barrierFlags);
     }
 
-    public int getBarrierFlags() {
-        return barrierFlags;
-    }
-
     public int getUniformLocation(String name) {
         return glGetUniformLocation(programHandle, name);
     }
@@ -55,10 +58,6 @@ public class ComputeProgram {
 
     public String getInfoLog() {
         return glGetProgramInfoLog(programHandle);
-    }
-
-    public int getProgramHandle() {
-        return programHandle;
     }
 
     public void delete() {

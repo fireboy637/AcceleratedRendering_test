@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.RenderType;
 public class PassThroughCullingProgramSelector implements ICullingProgramSelector {
 
     public static final ICullingProgramSelector INSTANCE = new PassThroughCullingProgramSelector();
-    public static final FlagsExtraVertexData EMPTY = new FlagsExtraVertexData();
+    public static final FlagsExtraVertexData EMPTY_FLAGS = new FlagsExtraVertexData();
 
     @Override
     public IPolygonProgramDispatcher select(RenderType renderType) {
@@ -28,6 +28,6 @@ public class PassThroughCullingProgramSelector implements ICullingProgramSelecto
 
     @Override
     public IExtraVertexData getExtraVertex(VertexFormat.Mode mode) {
-        return EMPTY;
+        return EMPTY_FLAGS;
     }
 }

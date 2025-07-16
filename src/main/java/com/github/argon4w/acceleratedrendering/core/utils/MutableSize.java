@@ -1,5 +1,8 @@
 package com.github.argon4w.acceleratedrendering.core.utils;
 
+import lombok.Getter;
+
+@Getter
 public class MutableSize {
 
     protected boolean resized;
@@ -47,14 +50,6 @@ public class MutableSize {
 
     public void resizeTo(long newBufferSize) {
         expand(newBufferSize - size);
-    }
-
-    public long getSize() {
-        return size;
-    }
-
-    public boolean isResized() {
-        return resized;
     }
 
     public void resetResized() {

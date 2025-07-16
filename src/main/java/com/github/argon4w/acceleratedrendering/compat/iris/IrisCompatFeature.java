@@ -27,14 +27,6 @@ public class IrisCompatFeature {
         return getPolygonProcessingSetting() == FeatureStatus.ENABLED;
     }
 
-    public static boolean isIrisCompatEntitiesEnabled() {
-        return FeatureConfig.CONFIG.irisCompatEntitiesCompat.get() == FeatureStatus.ENABLED;
-    }
-
-    public static boolean isFastRenderTypeCheckEnabled() {
-        return FeatureConfig.CONFIG.irisCompatFastRenderTypeCheck.get() == FeatureStatus.ENABLED;
-    }
-
     public static void disableShadowCulling() {
         SHADOW_CULLING_CONTROLLER_STACK.push(FeatureStatus.DISABLED);
     }

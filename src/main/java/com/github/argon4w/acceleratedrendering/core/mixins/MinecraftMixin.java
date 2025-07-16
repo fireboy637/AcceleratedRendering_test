@@ -19,7 +19,10 @@ public class MinecraftMixin {
     @Final
     private ReloadableResourceManager resourceManager;
 
-    @Inject(method = "<init>", at = @At("TAIL"))
+    @Inject(
+            method = "<init>",
+            at = @At("TAIL")
+    )
     public void setDebugContext(GameConfig gameConfig, CallbackInfo ci) {
         if (CoreFeature.isDebugContextEnabled()) {
             DebugOutput.enable();

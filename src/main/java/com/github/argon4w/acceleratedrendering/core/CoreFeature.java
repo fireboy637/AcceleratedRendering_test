@@ -9,6 +9,8 @@ public class CoreFeature {
 
     public static final ArrayDeque<FeatureStatus> FORCE_TRANSLUCENT_ACCELERATION_CONTROLLER_STACK = new ArrayDeque<>();
     public static final ArrayDeque<FeatureStatus> CACHE_IDENTICAL_POSE_CONTROLLER_STACK = new ArrayDeque<>();
+    public static boolean RENDERING_LEVEL = false;
+    public static boolean RENDERING_HAND = false;
 
     public static boolean isDebugContextEnabled() {
         return FeatureConfig.CONFIG.coreDebugContextEnabled.get() == FeatureStatus.ENABLED;
@@ -80,5 +82,29 @@ public class CoreFeature {
 
     public static FeatureStatus getDefaultCacheIdenticalPoseSetting() {
         return FeatureConfig.CONFIG.coreCacheIdenticalPose.get();
+    }
+
+    public static void setRenderingLevel() {
+        RENDERING_LEVEL = true;
+    }
+
+    public static void resetRenderingLevel() {
+        RENDERING_LEVEL = false;
+    }
+
+    public static void setRenderingHand() {
+        RENDERING_HAND = true;
+    }
+
+    public static void resetRenderingHand() {
+        RENDERING_HAND = false;
+    }
+
+    public static boolean isRenderingLevel() {
+        return RENDERING_LEVEL;
+    }
+
+    public static boolean isRenderingHand() {
+        return RENDERING_HAND;
     }
 }

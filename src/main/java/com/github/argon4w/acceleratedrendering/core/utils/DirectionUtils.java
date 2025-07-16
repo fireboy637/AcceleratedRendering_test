@@ -4,7 +4,7 @@ import net.minecraft.core.Direction;
 
 public class DirectionUtils {
 
-    public static final Direction[] FULL = new Direction[] {
+    public static final Direction[] FULL = new Direction[]{
             null,
             Direction.DOWN,
             Direction.UP,

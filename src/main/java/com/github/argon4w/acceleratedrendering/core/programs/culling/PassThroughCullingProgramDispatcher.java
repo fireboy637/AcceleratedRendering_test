@@ -13,8 +13,8 @@ public class PassThroughCullingProgramDispatcher implements IPolygonProgramDispa
 
     public static final PassThroughCullingProgramDispatcher QUAD = new PassThroughCullingProgramDispatcher(VertexFormat.Mode.QUADS, ComputeShaderPrograms.CORE_PASS_THROUGH_QUAD_CULLING_KEY);
     public static final PassThroughCullingProgramDispatcher TRIANGLE = new PassThroughCullingProgramDispatcher(VertexFormat.Mode.TRIANGLES, ComputeShaderPrograms.CORE_PASS_THROUGH_TRIANGLE_CULLING_KEY);
-
     private static final int GROUP_SIZE = 128;
+    private static final int DISPATCH_COUNT_Y_Z = 1;
 
     private final VertexFormat.Mode mode;
     private final ComputeProgram program;
@@ -30,15 +30,18 @@ public class PassThroughCullingProgramDispatcher implements IPolygonProgramDispa
 
     @Override
     public int dispatch(AcceleratedBufferBuilder builder) {
-        int vertexCount = builder.getVertexCount();
-        int vertexOffset = builder.getVertexOffset();
-        int polygonCount = vertexCount / mode.primitiveLength;
+        var vertexCount = builder.getTotalVertexCount();
+        var polygonCount = vertexCount / mode.primitiveLength;
 
         polygonCountUniform.uploadUnsignedInt(polygonCount);
-        vertexOffsetUniform.uploadUnsignedInt(vertexOffset);
+        vertexOffsetUniform.uploadUnsignedInt((int) builder.getVertexBuffer().getOffset());
 
         program.useProgram();
-        program.dispatch((polygonCount + GROUP_SIZE - 1) / GROUP_SIZE);
+        program.dispatch(
+                (polygonCount + GROUP_SIZE - 1) / GROUP_SIZE,
+                DISPATCH_COUNT_Y_Z,
+                DISPATCH_COUNT_Y_Z
+        );
         program.resetProgram();
 
         return program.getBarrierFlags();

@@ -30,39 +30,20 @@ public class OrientationCullingProgramSelector implements ICullingProgramSelecto
 
     @Override
     public IPolygonProgramDispatcher select(RenderType renderType) {
-        if (!OrientationCullingFeature.isEnabled()) {
-            return parent.select(renderType);
-        }
-
-        if (this.mode != renderType.mode) {
-            return parent.select(renderType);
-        }
-
-        if (OrientationCullingFeature.shouldIgnoreCullState()) {
-            return dispatcher;
-        }
-
-        if (RenderTypeUtils.isCulled(renderType)) {
-            return dispatcher;
-        }
-
-        return parent.select(renderType);
+        return OrientationCullingFeature.isEnabled()
+                && (OrientationCullingFeature.shouldIgnoreCullState() || RenderTypeUtils.isCulled(renderType))
+                && this.mode.equals(renderType.mode)
+                ? dispatcher
+                : parent.select(renderType);
     }
 
     @Override
     public IExtraVertexData getExtraVertex(VertexFormat.Mode mode) {
-        if (!OrientationCullingFeature.isEnabled()) {
-            return parent.getExtraVertex(mode);
-        }
-
-        if (this.mode != mode) {
-            return parent.getExtraVertex(mode);
-        }
-
-        if (!OrientationCullingFeature.shouldCull()) {
-            return EMPTY;
-        }
-
-        return NO_CULL;
+        return this.mode.equals(mode)
+                && OrientationCullingFeature.isEnabled()
+                ? (OrientationCullingFeature.shouldCull()
+                ? EMPTY
+                : NO_CULL)
+                : parent.getExtraVertex(mode);
     }
 }

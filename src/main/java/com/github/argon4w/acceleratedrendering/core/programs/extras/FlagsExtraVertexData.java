@@ -1,6 +1,6 @@
 package com.github.argon4w.acceleratedrendering.core.programs.extras;
 
-import org.lwjgl.system.MemoryUtil;
+import com.github.argon4w.acceleratedrendering.core.buffers.accelerated.builders.AcceleratedBufferBuilder;
 
 public class FlagsExtraVertexData implements IExtraVertexData {
 
@@ -28,7 +28,7 @@ public class FlagsExtraVertexData implements IExtraVertexData {
 
     @Override
     public void addExtraVarying(long address) {
-        MemoryUtil.memPutInt(address + 3L * 4L, data);
+        AcceleratedBufferBuilder.VARYING_FLAGS.putInt(address, data);
     }
 
     @Override

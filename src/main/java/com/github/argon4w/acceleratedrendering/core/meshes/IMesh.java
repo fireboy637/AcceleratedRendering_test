@@ -1,7 +1,7 @@
 package com.github.argon4w.acceleratedrendering.core.meshes;
 
 import com.github.argon4w.acceleratedrendering.core.buffers.accelerated.builders.IAcceleratedVertexConsumer;
-import com.github.argon4w.acceleratedrendering.core.meshes.collectors.MeshCollector;
+import com.github.argon4w.acceleratedrendering.core.meshes.collectors.IMeshCollector;
 
 public interface IMesh {
 
@@ -9,7 +9,8 @@ public interface IMesh {
 
     interface Builder {
 
-        IMesh build(MeshCollector collector);
+        IMesh build(IMeshCollector collector);
+
         void close();
     }
 }

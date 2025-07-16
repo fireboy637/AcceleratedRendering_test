@@ -1,25 +1,16 @@
 package com.github.argon4w.acceleratedrendering.core.meshes;
 
-import com.github.argon4w.acceleratedrendering.core.backends.buffers.MappedBuffer;
+import com.github.argon4w.acceleratedrendering.core.backends.buffers.IServerBuffer;
+import com.github.argon4w.acceleratedrendering.core.backends.buffers.MutableBuffer;
 import com.github.argon4w.acceleratedrendering.core.buffers.accelerated.builders.IAcceleratedVertexConsumer;
-import com.github.argon4w.acceleratedrendering.core.meshes.collectors.MeshCollector;
-import com.github.argon4w.acceleratedrendering.core.utils.LazyMap;
-import com.mojang.blaze3d.vertex.ByteBufferBuilder;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import org.lwjgl.system.MemoryUtil;
+import com.github.argon4w.acceleratedrendering.core.meshes.collectors.IMeshCollector;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
-import java.nio.ByteBuffer;
-import java.util.Map;
+import java.util.List;
 
-public class ServerMesh implements IMesh {
+import static org.lwjgl.opengl.GL44.GL_DYNAMIC_STORAGE_BIT;
 
-    private final int size;
-    private final int offset;
-
-    public ServerMesh(int size, int offset) {
-        this.size = size;
-        this.offset = offset;
-    }
+public record ServerMesh(long size, IServerBuffer meshBuffer) implements IMesh {
 
     @Override
     public void write(
@@ -29,8 +20,7 @@ public class ServerMesh implements IMesh {
             int overlay
     ) {
         extension.addServerMesh(
-                offset,
-                size,
+                this,
                 color,
                 light,
                 overlay
@@ -41,48 +31,45 @@ public class ServerMesh implements IMesh {
 
         public static final Builder INSTANCE = new Builder();
 
-        public final Map<VertexFormat, MappedBuffer> storageBuffers;
+        private final List<ServerMesh> meshes;
 
         private Builder() {
-            this.storageBuffers = new LazyMap<>(() -> new MappedBuffer(1024L, true));
+            this.meshes = new ObjectArrayList<>();
         }
 
         @Override
-        public IMesh build(MeshCollector collector) {
-            int vertexCount = collector.getVertexCount();
+        public IMesh build(IMeshCollector collector) {
+            var vertexCount = collector.getVertexCount();
 
             if (vertexCount == 0) {
                 return EmptyMesh.INSTANCE;
             }
 
-            ByteBufferBuilder builder = collector.getBuffer();
-            ByteBufferBuilder.Result result = builder.build();
+            var builder = collector.getBuffer();
+            var result = builder.build();
 
             if (result == null) {
                 builder.close();
                 return EmptyMesh.INSTANCE;
             }
 
-            ByteBuffer clientBuffer = result.byteBuffer();
-            MappedBuffer serverBuffer = storageBuffers.get(collector.getVertexFormat());
+            var clientBuffer = result.byteBuffer();
+            var serverBuffer = new MutableBuffer(clientBuffer.capacity(), GL_DYNAMIC_STORAGE_BIT);
+            var mesh = new ServerMesh(vertexCount, serverBuffer);
 
-            long capacity = clientBuffer.capacity();
-            long position = serverBuffer.getPosition();
-
-            MemoryUtil.memCopy(
-                    MemoryUtil.memAddress0(clientBuffer),
-                    serverBuffer.reserve(capacity),
-                    capacity
-            );
-
+            meshes.add(mesh);
+            serverBuffer.data(clientBuffer);
             builder.close();
-            return new ServerMesh(vertexCount, (int) position);
+
+            return mesh;
         }
 
         @Override
         public void close() {
-            for (MappedBuffer buffer : storageBuffers.values()) {
-                buffer.delete();
+            for (var mesh : meshes) {
+                mesh
+                        .meshBuffer
+                        .delete();
             }
         }
     }

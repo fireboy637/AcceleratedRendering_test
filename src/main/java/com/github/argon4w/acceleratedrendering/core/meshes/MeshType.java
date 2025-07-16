@@ -1,5 +1,8 @@
 package com.github.argon4w.acceleratedrendering.core.meshes;
 
+import lombok.Getter;
+
+@Getter
 public enum MeshType {
 
     SERVER(ServerMesh.Builder.INSTANCE),
@@ -9,9 +12,5 @@ public enum MeshType {
 
     MeshType(IMesh.Builder builder) {
         this.builder = builder;
-    }
-
-    public IMesh.Builder getBuilder() {
-        return builder;
     }
 }

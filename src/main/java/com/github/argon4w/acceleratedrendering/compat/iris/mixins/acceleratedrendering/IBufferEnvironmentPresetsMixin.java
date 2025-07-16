@@ -14,34 +14,72 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(value = IBufferEnvironment.Presets.class, remap = false)
+@Mixin(IBufferEnvironment.Presets.class)
 public class IBufferEnvironmentPresetsMixin {
-    @WrapOperation(method = "<clinit>", at = @At(value = "FIELD", target = "Lcom/github/argon4w/acceleratedrendering/core/buffers/environments/IBufferEnvironment$Presets;BLOCK:Lcom/github/argon4w/acceleratedrendering/core/buffers/environments/IBufferEnvironment;", opcode = Opcodes.PUTSTATIC))
+
+    @Mutable
+    @Shadow
+    @Final
+    public static IBufferEnvironment BLOCK;
+    @Mutable
+    @Shadow
+    @Final
+    public static IBufferEnvironment ENTITY;
+    @Mutable
+    @Shadow
+    @Final
+    public static IBufferEnvironment POS_COLOR_TEX_LIGHT;
+
+    @WrapOperation(
+            method = "<clinit>",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lcom/github/argon4w/acceleratedrendering/core/buffers/environments/IBufferEnvironment$Presets;BLOCK:Lcom/github/argon4w/acceleratedrendering/core/buffers/environments/IBufferEnvironment;",
+                    opcode = Opcodes.PUTSTATIC
+            )
+    )
     private static void useIrisBloockEnvironment(IBufferEnvironment value, Operation<Void> original) {
         original.call(new IrisBufferEnvironment(
                 value,
                 DefaultVertexFormat.BLOCK,
                 IrisVertexFormats.TERRAIN,
+                IrisPrograms.IRIS_BLOCK_MESH_UPLOADING_KEY,
                 IrisPrograms.IRIS_BLOCK_VERTEX_TRANSFORM_KEY
         ));
     }
 
-    @WrapOperation(method = "<clinit>", at = @At(value = "FIELD", target = "Lcom/github/argon4w/acceleratedrendering/core/buffers/environments/IBufferEnvironment$Presets;ENTITY:Lcom/github/argon4w/acceleratedrendering/core/buffers/environments/IBufferEnvironment;", opcode = Opcodes.PUTSTATIC))
+    @WrapOperation(
+            method = "<clinit>",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lcom/github/argon4w/acceleratedrendering/core/buffers/environments/IBufferEnvironment$Presets;ENTITY:Lcom/github/argon4w/acceleratedrendering/core/buffers/environments/IBufferEnvironment;",
+                    opcode = Opcodes.PUTSTATIC
+            )
+    )
     private static void useIrisEntityEnvironment(IBufferEnvironment value, Operation<Void> original) {
         original.call(new IrisBufferEnvironment(
                 value,
                 DefaultVertexFormat.NEW_ENTITY,
                 IrisVertexFormats.ENTITY,
+                IrisPrograms.IRIS_ENTITY_MESH_UPLOADING_KEY,
                 IrisPrograms.IRIS_ENTITY_VERTEX_TRANSFORM_KEY
         ));
     }
 
-    @WrapOperation(method = "<clinit>", at = @At(value = "FIELD", target = "Lcom/github/argon4w/acceleratedrendering/core/buffers/environments/IBufferEnvironment$Presets;POS_COLOR_TEX_LIGHT:Lcom/github/argon4w/acceleratedrendering/core/buffers/environments/IBufferEnvironment;", opcode = Opcodes.PUTSTATIC))
+    @WrapOperation(
+            method = "<clinit>",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lcom/github/argon4w/acceleratedrendering/core/buffers/environments/IBufferEnvironment$Presets;POS_COLOR_TEX_LIGHT:Lcom/github/argon4w/acceleratedrendering/core/buffers/environments/IBufferEnvironment;",
+                    opcode = Opcodes.PUTSTATIC
+            )
+    )
     private static void useIrisGlyphEnvironment(IBufferEnvironment value, Operation<Void> original) {
         original.call(new IrisBufferEnvironment(
                 value,
                 DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP,
                 IrisVertexFormats.GLYPH,
+                IrisPrograms.IRIS_GLYPH_MESH_UPLOADING_KEY,
                 IrisPrograms.IRIS_GLYPH_VERTEX_TRANSFORM_KEY
         ));
     }

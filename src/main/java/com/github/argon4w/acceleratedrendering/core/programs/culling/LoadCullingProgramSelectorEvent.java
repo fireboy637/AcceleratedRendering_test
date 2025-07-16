@@ -1,6 +1,7 @@
 package com.github.argon4w.acceleratedrendering.core.programs.culling;
 
 import com.mojang.blaze3d.vertex.VertexFormat;
+import lombok.Getter;
 import net.neoforged.bus.api.Event;
 import net.neoforged.fml.event.IModBusEvent;
 
@@ -10,6 +11,7 @@ public class LoadCullingProgramSelectorEvent extends Event implements IModBusEve
 
     private final VertexFormat vertexFormat;
 
+    @Getter
     private ICullingProgramSelector selector;
 
     public LoadCullingProgramSelectorEvent(VertexFormat vertexFormat) {
@@ -21,9 +23,5 @@ public class LoadCullingProgramSelectorEvent extends Event implements IModBusEve
         if (this.vertexFormat == vertexFormat) {
             this.selector = selector.apply(this.selector);
         }
-    }
-
-    public ICullingProgramSelector getSelector() {
-        return selector;
     }
 }

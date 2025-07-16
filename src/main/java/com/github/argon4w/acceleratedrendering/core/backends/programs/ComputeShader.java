@@ -1,7 +1,10 @@
 package com.github.argon4w.acceleratedrendering.core.backends.programs;
 
+import lombok.Getter;
+
 import static org.lwjgl.opengl.GL46.*;
 
+@Getter
 public class ComputeShader {
 
     private final int shaderHandle;
@@ -25,9 +28,5 @@ public class ComputeShader {
 
     public void delete() {
         glDeleteShader(shaderHandle);
-    }
-
-    public int getShaderHandle() {
-        return shaderHandle;
     }
 }

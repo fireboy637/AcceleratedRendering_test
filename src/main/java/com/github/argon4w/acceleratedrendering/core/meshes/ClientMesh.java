@@ -1,22 +1,19 @@
 package com.github.argon4w.acceleratedrendering.core.meshes;
 
 import com.github.argon4w.acceleratedrendering.core.buffers.accelerated.builders.IAcceleratedVertexConsumer;
-import com.github.argon4w.acceleratedrendering.core.meshes.collectors.MeshCollector;
+import com.github.argon4w.acceleratedrendering.core.meshes.collectors.IMeshCollector;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
+import lombok.AllArgsConstructor;
 
 import java.nio.ByteBuffer;
 import java.util.Set;
 
+@AllArgsConstructor
 public class ClientMesh implements IMesh {
 
     private final int size;
     private final ByteBuffer vertexBuffer;
-
-    public ClientMesh(int size, ByteBuffer vertexBuffer) {
-        this.size = size;
-        this.vertexBuffer = vertexBuffer;
-    }
 
     @Override
     public void write(
@@ -45,15 +42,15 @@ public class ClientMesh implements IMesh {
         }
 
         @Override
-        public IMesh build(MeshCollector collector) {
-            int vertexCount = collector.getVertexCount();
+        public IMesh build(IMeshCollector collector) {
+            var vertexCount = collector.getVertexCount();
 
             if (vertexCount == 0) {
                 return EmptyMesh.INSTANCE;
             }
 
-            ByteBufferBuilder builder = collector.getBuffer();
-            ByteBufferBuilder.Result result = builder.build();
+            var builder = collector.getBuffer();
+            var result = builder.build();
 
             if (result == null) {
                 builder.close();
@@ -66,7 +63,7 @@ public class ClientMesh implements IMesh {
 
         @Override
         public void close() {
-            for (ByteBufferBuilder builder : builders) {
+            for (var builder : builders) {
                 builder.close();
             }
         }

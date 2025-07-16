@@ -29,35 +29,19 @@ public class IrisPolygonProcessor implements IPolygonProcessor {
 
     @Override
     public IPolygonProgramDispatcher select(VertexFormat.Mode mode) {
-        if (!IrisCompatFeature.isEnabled()) {
-            return parent.select(mode);
-        }
-
-        if (!IrisCompatFeature.isPolygonProcessingEnabled()) {
-            return parent.select(mode);
-        }
-
-        if (this.mode != mode) {
-            return parent.select(mode);
-        }
-
-        return dispatcher;
+        return IrisCompatFeature.isEnabled()
+                && IrisCompatFeature.isPolygonProcessingEnabled()
+                && this.mode.equals(mode)
+                ? dispatcher
+                : parent.select(mode);
     }
 
     @Override
     public IExtraVertexData getExtraVertex(VertexFormat.Mode mode) {
-        if (!IrisCompatFeature.isEnabled()) {
-            return parent.getExtraVertex(mode);
-        }
-
-        if (!IrisCompatFeature.isPolygonProcessingEnabled()) {
-            return parent.getExtraVertex(mode);
-        }
-
-        if (this.mode != mode) {
-            return parent.getExtraVertex(mode);
-        }
-
-        return extraVertexData;
+        return IrisCompatFeature.isEnabled()
+                && IrisCompatFeature.isPolygonProcessingEnabled()
+                && this.mode.equals(mode)
+                ? extraVertexData
+                : parent.getExtraVertex(mode);
     }
 }

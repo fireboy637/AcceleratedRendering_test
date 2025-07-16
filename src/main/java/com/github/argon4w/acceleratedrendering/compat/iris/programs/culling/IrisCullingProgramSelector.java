@@ -33,63 +33,26 @@ public class IrisCullingProgramSelector implements ICullingProgramSelector {
 
     @Override
     public IPolygonProgramDispatcher select(RenderType renderType) {
-        if (!IrisCompatFeature.isEnabled()) {
-            return parent.select(renderType);
-        }
-
-        if (!IrisCompatFeature.isIrisCompatCullingEnabled()) {
-            return parent.select(renderType);
-        }
-
-        if (!IrisCompatFeature.isShadowCullingEnabled() && ShadowRenderingState.areShadowsCurrentlyBeingRendered()) {
-            return parent.select(renderType);
-        }
-
-        if (!OrientationCullingFeature.isEnabled()) {
-            return parent.select(renderType);
-        }
-
-        if (this.mode != renderType.mode) {
-            return parent.select(renderType);
-        }
-
-        if (OrientationCullingFeature.shouldIgnoreCullState()) {
-            return dispatcher;
-        }
-
-        if (RenderTypeUtils.isCulled(renderType)) {
-            return dispatcher;
-        }
-
-        return parent.select(renderType);
+        return IrisCompatFeature.isEnabled()
+                && IrisCompatFeature.isIrisCompatCullingEnabled()
+                && (IrisCompatFeature.isShadowCullingEnabled() || !ShadowRenderingState.areShadowsCurrentlyBeingRendered())
+                && OrientationCullingFeature.isEnabled()
+                && (OrientationCullingFeature.shouldIgnoreCullState() || RenderTypeUtils.isCulled(renderType))
+                && this.mode.equals(renderType.mode)
+                ? dispatcher
+                : parent.select(renderType);
     }
 
     @Override
     public IExtraVertexData getExtraVertex(VertexFormat.Mode mode) {
-        if (!IrisCompatFeature.isEnabled()) {
-            return parent.getExtraVertex(mode);
-        }
-
-        if (!IrisCompatFeature.isIrisCompatCullingEnabled()) {
-            return parent.getExtraVertex(mode);
-        }
-
-        if (!OrientationCullingFeature.isEnabled()) {
-            return parent.getExtraVertex(mode);
-        }
-
-        if (this.mode != mode) {
-            return parent.getExtraVertex(mode);
-        }
-
-        if (!IrisCompatFeature.isShadowCullingEnabled() && ShadowRenderingState.areShadowsCurrentlyBeingRendered()) {
-            return EMPTY;
-        }
-
-        if (!OrientationCullingFeature.shouldCull()) {
-            return NO_CULL;
-        }
-
-        return EMPTY;
+        return IrisCompatFeature.isEnabled()
+                && IrisCompatFeature.isIrisCompatCullingEnabled()
+                && this.mode.equals(mode)
+                && OrientationCullingFeature.isEnabled()
+                ? (OrientationCullingFeature.shouldCull()
+                && (IrisCompatFeature.isShadowCullingEnabled() || !ShadowRenderingState.areShadowsCurrentlyBeingRendered())
+                ? EMPTY
+                : NO_CULL)
+                : parent.getExtraVertex(mode);
     }
 }

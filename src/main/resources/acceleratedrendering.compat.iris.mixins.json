@@ -6,16 +6,17 @@
   "plugin": "com.github.argon4w.acceleratedrendering.compat.iris.mixins.plugin.IrisCompatMixinPlugin",
   "client": [
     "acceleratedrendering.AcceleratedBufferSourceMixin",
+    "acceleratedrendering.AcceleratedBufferSourceSetMixin",
     "acceleratedrendering.AcceleratedRenderingModEntryMixin",
+    "acceleratedrendering.CoreBuffersMixin",
     "acceleratedrendering.IBufferEnvironmentPresetsMixin",
-    "acceleratedrendering.RedirectingBufferSourceMixin",
     "acceleratedrendering.RenderTypeUtilsMixin",
+    "iris.FullyBufferedMultiBufferSourceMixin",
+    "iris.HandRendererMixin",
     "iris.IrisVertexFormatsMixin",
     "iris.ModelToEntityVertexSerializerMixin",
     "iris.ShadowRendererMixin",
-    "iris.WrappableRenderTypeMixin",
-    "vanilla.LevelRendererMixin",
-    "vanilla.RenderTypeMixin"
+    "vanilla.LevelRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

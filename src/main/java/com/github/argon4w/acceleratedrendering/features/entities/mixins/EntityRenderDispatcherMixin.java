@@ -1,10 +1,12 @@
 package com.github.argon4w.acceleratedrendering.features.entities.mixins;
 
-import com.github.argon4w.acceleratedrendering.core.buffers.accelerated.builders.IAcceleratedVertexConsumer;
+import com.github.argon4w.acceleratedrendering.core.CoreFeature;
+import com.github.argon4w.acceleratedrendering.core.buffers.accelerated.builders.VertexConsumerExtension;
 import com.github.argon4w.acceleratedrendering.features.entities.AcceleratedEntityRenderingFeature;
 import com.github.argon4w.acceleratedrendering.features.entities.AcceleratedEntityShadowRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import lombok.experimental.ExtensionMethod;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -19,13 +21,23 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = EntityRenderDispatcher.class, priority = 999)
+@ExtensionMethod(VertexConsumerExtension.class)
+@Mixin(
+        value = EntityRenderDispatcher.class,
+        priority = 999
+)
 public class EntityRenderDispatcherMixin {
 
-    @Unique private static final Matrix3f SHADOW_NORMAL_MATRIX = new Matrix3f().identity();
-    @Unique private static final AcceleratedEntityShadowRenderer SHADOW_RENDERER = new AcceleratedEntityShadowRenderer();
+    @Unique
+    private static final Matrix3f SHADOW_NORMAL_MATRIX = new Matrix3f().identity();
+    @Unique
+    private static final AcceleratedEntityShadowRenderer SHADOW_RENDERER = new AcceleratedEntityShadowRenderer();
 
-    @Inject(method = "renderBlockShadow", at = @At("HEAD"), cancellable = true)
+    @Inject(
+            method = "renderBlockShadow",
+            at = @At("HEAD"),
+            cancellable = true
+    )
     private static void fastBlockShadow(
             PoseStack.Pose pPose,
             VertexConsumer pVertexConsumer,
@@ -39,36 +51,34 @@ public class EntityRenderDispatcherMixin {
             float pWeight,
             CallbackInfo ci
     ) {
-        IAcceleratedVertexConsumer extension = (IAcceleratedVertexConsumer) pVertexConsumer;
+        var extension = pVertexConsumer.getAccelerated();
 
-        if (!AcceleratedEntityRenderingFeature.isEnabled()) {
-            return;
+        if (CoreFeature.isRenderingLevel()
+                && AcceleratedEntityRenderingFeature.isEnabled()
+                && AcceleratedEntityRenderingFeature.shouldUseAcceleratedPipeline()
+                && extension.isAccelerated()
+        ) {
+            ci.cancel();
+            extension.doRender(
+                    SHADOW_RENDERER,
+                    new AcceleratedEntityShadowRenderer.Context(
+                            pLevel,
+                            pChunk,
+                            pPos,
+                            new Vector3f(
+                                    (float) pX,
+                                    (float) pY,
+                                    (float) pZ
+                            ),
+                            pSize,
+                            pWeight
+                    ),
+                    pPose.pose(),
+                    SHADOW_NORMAL_MATRIX,
+                    LightTexture.FULL_BRIGHT,
+                    OverlayTexture.NO_OVERLAY,
+                    -1
+            );
         }
-
-        if (!AcceleratedEntityRenderingFeature.shouldUseAcceleratedPipeline()) {
-            return;
-        }
-
-        if (!extension.isAccelerated()) {
-            return;
-        }
-
-        ci.cancel();
-        extension.doRender(
-                SHADOW_RENDERER,
-                new AcceleratedEntityShadowRenderer.Context(
-                        pLevel,
-                        pChunk,
-                        pPos,
-                        new Vector3f((float) pX, (float) pY, (float) pZ),
-                        pSize,
-                        pWeight
-                ),
-                pPose.pose(),
-                SHADOW_NORMAL_MATRIX,
-                LightTexture.FULL_BRIGHT,
-                OverlayTexture.NO_OVERLAY,
-                -1
-        );
     }
 }
