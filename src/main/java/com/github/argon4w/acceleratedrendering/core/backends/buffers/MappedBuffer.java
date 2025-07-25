@@ -2,14 +2,13 @@ package com.github.argon4w.acceleratedrendering.core.backends.buffers;
 
 import lombok.Getter;
 
-import java.nio.ByteBuffer;
-
 import static org.lwjgl.opengl.GL46.*;
 
+@Getter
 public class MappedBuffer extends MutableBuffer implements IClientBuffer {
 
-	protected				long 	address;
-	@Getter protected 		long	position;
+	protected long address;
+	protected long position;
 
 	public MappedBuffer(long initialSize) {
 		super(initialSize,	GL_MAP_PERSISTENT_BIT
@@ -21,21 +20,29 @@ public class MappedBuffer extends MutableBuffer implements IClientBuffer {
 	}
 
 	@Override
-	public long reserve(long bytes) {
-		var position	= this.position;
-		this.position	= position + bytes;
-
-		if (this.position <= size) {
+	public long reserve(long bytes, boolean occupied) {
+		if (bytes <= 0) {
 			return address + position;
 		}
 
-		resize(this.position);
-		return address + position;
+		var oldPosition = this.position;
+		var newPosition = oldPosition + bytes;
+
+		if (occupied) {
+			this.position = newPosition;
+		}
+
+		if (newPosition <= size) {
+			return address + oldPosition;
+		}
+
+		resize(newPosition);
+		return address + oldPosition;
 	}
 
 	@Override
-	public void data(ByteBuffer data) {
-		throw new UnsupportedOperationException("Unsupported Operation.");
+	public long reserve(long bytes) {
+		return reserve(bytes, true);
 	}
 
 	@Override
@@ -53,14 +60,13 @@ public class MappedBuffer extends MutableBuffer implements IClientBuffer {
 		address = map();
 	}
 
+	public void reset() {
+		position = 0;
+	}
+
 	public long map() {
 		return map(	GL_MAP_WRITE_BIT
 				|	GL_MAP_PERSISTENT_BIT
-				|	GL_MAP_COHERENT_BIT
-				|	GL_MAP_UNSYNCHRONIZED_BIT);
-	}
-
-	public void reset() {
-		position = 0;
+				|	GL_MAP_COHERENT_BIT);
 	}
 }

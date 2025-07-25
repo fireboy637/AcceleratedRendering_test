@@ -1,5 +1,6 @@
 package com.github.argon4w.acceleratedrendering.core.buffers.accelerated.pools;
 
+import com.github.argon4w.acceleratedrendering.core.backends.GLConstants;
 import com.github.argon4w.acceleratedrendering.core.backends.buffers.MutableBuffer;
 import com.github.argon4w.acceleratedrendering.core.utils.MutableSize;
 import com.github.argon4w.acceleratedrendering.core.utils.SimpleResetPool;
@@ -25,20 +26,19 @@ public class ElementBufferPool extends SimpleResetPool<ElementBufferPool.Element
 	}
 
 	public void prepare() {
-		elementBufferOut		.resizeTo	(elementBufferOutSize.getValue());
-		elementBufferSegments	.setValue	(0L);
-	}
-
-	@Override
-	public void delete() {
-		elementBufferOut.delete();
-		super			.delete();
+		elementBufferOut		.resizeTo(elementBufferOutSize.getValue());
+		elementBufferSegments	.setValue(0L);
 	}
 
 	@Override
 	public void reset() {
 		elementBufferOutUsedSize.setValue	(0L);
 		super					.reset		();
+	}
+
+	@Override
+	public void delete() {
+		elementBufferOut.delete();
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class ElementBufferPool extends SimpleResetPool<ElementBufferPool.Element
 
 	@Override
 	public boolean test(ElementSegment elementSegment) {
-		return elementBufferOutUsedSize.addAndGet(elementSegment.getSize()) <= (2L * 1024L * 1024L * 1024L);
+		return elementBufferOutUsedSize.addAndGet(elementSegment.getSize()) <= GLConstants.MAX_SHADER_STORAGE_BLOCK_SIZE;
 	}
 
 	@Getter

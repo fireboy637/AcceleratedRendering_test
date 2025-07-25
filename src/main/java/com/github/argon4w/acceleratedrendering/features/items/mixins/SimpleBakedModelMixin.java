@@ -101,17 +101,16 @@ public abstract class SimpleBakedModelMixin implements IAcceleratedBakedModel, I
 			return;
 		}
 
-		layers = new Int2ObjectLinkedOpenHashMap<>();
-		meshes.put(extension, layers);
-
-		var culledMeshCollectors = new Int2ObjectOpenHashMap<CulledMeshCollector>();
+		var culledMeshCollectors	= new Int2ObjectOpenHashMap<CulledMeshCollector>();
+		layers 						= new Int2ObjectLinkedOpenHashMap<>				();
+		meshes.put																	(extension, layers);
 
 		for (var direction : DirectionUtils.FULL) {
 			for (var quad : getQuads(null, direction, null)) {
 				var culledMeshCollector = culledMeshCollectors.get(quad.getTintIndex());
 
 				if (culledMeshCollector == null) {
-					culledMeshCollector = new CulledMeshCollector	(extension	.getRenderType	(),	extension.getBufferSet().getLayout());
+					culledMeshCollector = new CulledMeshCollector	(extension	.getRenderType	(),	extension.getBufferSet().getBufferEnvironment().getLayout());
 					culledMeshCollectors.put						(quad		.getTintIndex	(),	culledMeshCollector);
 				}
 

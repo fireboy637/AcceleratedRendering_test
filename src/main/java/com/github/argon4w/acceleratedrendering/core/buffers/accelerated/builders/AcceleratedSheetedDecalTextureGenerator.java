@@ -18,7 +18,7 @@ import java.nio.ByteBuffer;
 )
 public class AcceleratedSheetedDecalTextureGenerator extends AcceleratedVertexConsumerWrapper {
 
-	@EqualsAndHashCode.Include private 	final	VertexConsumer	delegate;
+	@EqualsAndHashCode.Include private	final	VertexConsumer	delegate;
 	@EqualsAndHashCode.Include private	final	Matrix4f		cameraInverse;
 	private                             final	Matrix3f		normalInverse;
 	private								final	float			textureScale;

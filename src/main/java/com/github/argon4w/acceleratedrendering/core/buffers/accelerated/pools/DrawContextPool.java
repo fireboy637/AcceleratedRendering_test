@@ -1,6 +1,5 @@
 package com.github.argon4w.acceleratedrendering.core.buffers.accelerated.pools;
 
-import com.github.argon4w.acceleratedrendering.core.backends.buffers.IServerBuffer;
 import com.github.argon4w.acceleratedrendering.core.backends.buffers.MappedBuffer;
 import com.github.argon4w.acceleratedrendering.core.buffers.memory.IMemoryInterface;
 import com.github.argon4w.acceleratedrendering.core.buffers.memory.SimpleMemoryInterface;
@@ -32,7 +31,7 @@ public class DrawContextPool extends SimpleResetPool<DrawContextPool.IndirectDra
 
 	@Override
 	public void delete() {
-		super.getContext().delete();
+		getContext().delete();
 	}
 
 	@Override
@@ -43,9 +42,7 @@ public class DrawContextPool extends SimpleResetPool<DrawContextPool.IndirectDra
 
 	public class IndirectDrawContext {
 
-		public static	final int				ELEMENT_BUFFER_INDEX	= 6;
 		public static	final int				ELEMENT_COUNT_INDEX		= 0;
-
 		public static	final IMemoryInterface	INDIRECT_COUNT			= new SimpleMemoryInterface(0L * 4L, 4);
 		public static	final IMemoryInterface	INDIRECT_INSTANCE_COUNT	= new SimpleMemoryInterface(1L * 4L, 4);
 		public static	final IMemoryInterface	INDIRECT_FIRST_INDEX	= new SimpleMemoryInterface(2L * 4L, 4);
@@ -55,8 +52,8 @@ public class DrawContextPool extends SimpleResetPool<DrawContextPool.IndirectDra
 		private			final long				commandOffset;
 
 		public IndirectDrawContext(int index) {
-			this.commandOffset		= index * 20L;
-			var address				= context	.reserve(20L);
+			this.commandOffset	= index * 20L;
+			var address			= context		.reserve(20L);
 
 			INDIRECT_COUNT						.putInt	(address, 0);
 			INDIRECT_INSTANCE_COUNT				.putInt	(address, 1);
@@ -65,23 +62,12 @@ public class DrawContextPool extends SimpleResetPool<DrawContextPool.IndirectDra
 			INDIRECT_BASE_INSTANCE				.putInt	(address, 0);
 		}
 
-		public void bindComputeBuffers(IServerBuffer elementBuffer, ElementBufferPool.ElementSegment elementSegmentIn) {
-			elementSegmentIn							.allocateOffset();
-
-			var elementOffset		= elementSegmentIn	.getOffset();
-			var elementSize			= elementSegmentIn	.getSize			();
-			var commandAddress		= context			.addressAt			(commandOffset);
+		public void bindComputeBuffers(ElementBufferPool.ElementSegment elementSegmentIn) {
+			var elementOffset		= elementSegmentIn	.getOffset	();
+			var commandAddress		= context			.addressAt	(commandOffset);
 
 			INDIRECT_COUNT		.putInt		(commandAddress,	0);
 			INDIRECT_FIRST_INDEX.putInt		(commandAddress,	(int) elementOffset / 4);
-
-			elementBuffer		.bindRange	(
-					GL_SHADER_STORAGE_BUFFER,
-					ELEMENT_BUFFER_INDEX,
-					elementOffset,
-					elementSize
-			);
-
 			context				.bindRange	(
 					GL_ATOMIC_COUNTER_BUFFER,
 					ELEMENT_COUNT_INDEX,

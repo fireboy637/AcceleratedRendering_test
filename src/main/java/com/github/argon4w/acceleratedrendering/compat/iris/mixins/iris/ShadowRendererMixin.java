@@ -24,10 +24,10 @@ public class ShadowRendererMixin {
 			Camera					playerCamera,
 			CallbackInfo			ci
 	) {
-		IrisCompatBuffers.BLOCK_SHADOW			.drawBuffers	();
-		IrisCompatBuffers.ENTITY_SHADOW			.drawBuffers	();
-		IrisCompatBuffers.GLYPH_SHADOW			.drawBuffers	();
-		IrisCompatBuffers.POS_TEX_SHADOW		.drawBuffers	();
-		IrisCompatBuffers.POS_TEX_COLOR_SHADOW	.drawBuffers	();
+		IrisCompatBuffers.BLOCK_SHADOW			.drawBuffers();
+		IrisCompatBuffers.ENTITY_SHADOW			.drawBuffers();
+		IrisCompatBuffers.GLYPH_SHADOW			.drawBuffers();
+		IrisCompatBuffers.POS_TEX_SHADOW		.drawBuffers();
+		IrisCompatBuffers.POS_TEX_COLOR_SHADOW	.drawBuffers();
 	}
 }
